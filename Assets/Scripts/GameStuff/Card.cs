@@ -14,6 +14,6 @@ namespace GameStuff
 
         void Choose(Chooser chooser);
 
-        void act(Battle battle, MatchController controller);
+        void Act(Battle battle, MatchController controller);
     }
 }

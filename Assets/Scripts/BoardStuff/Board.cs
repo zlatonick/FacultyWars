@@ -6,6 +6,8 @@ namespace BoardStuff
 {
     public interface Board
     {
+        Board GetBoard();
+
         List<Character> GetAllCharacters();
 
         List<Cell> GetAllCells();
@@ -16,11 +18,13 @@ namespace BoardStuff
 
         void DestroyCharacter(Character character);
 
+        void ReturnCharacter(Character character);
+
         void StartBattle(Cell cell);
 
         void FinishBattle(Cell cell, Player winner);
 
-        List<Character> getCharactersOnCell(Cell cell);
+        List<Character> GetCharactersOnCell(Cell cell);
 
         Cell GetCharacterCell(Character character);
 

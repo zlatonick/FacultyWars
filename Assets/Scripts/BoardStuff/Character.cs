@@ -12,6 +12,8 @@ namespace BoardStuff
 
         StuffClass GetStuffClass();
 
+        Player GetPlayer();
+
         List<int> GetPowerHistory();
 
         void ChangePower(int changeBy);
