@@ -11,18 +11,27 @@ namespace Match
 {   
     public class MatchControllerImpl : MonoBehaviour, MatchController
     {
+        // Match info
 
         public Board board;
 
         Dictionary<Player, PlayerInfo> playersInfo;
 
-        Dictionary<Player, List<Battle>> battles;
-
-        bool isBattleNow;
+        // Players
 
         Player currPlayer;
 
         Player currOpponent;
+
+        // Battle info
+
+        bool isBattleNow;
+
+        Dictionary<Player, List<Battle>> battles;
+
+        Dictionary<Player, BattleStatus> battleStatus;
+
+        // Factories
 
         CharacterFactory characterFactory;
 
@@ -71,6 +80,11 @@ namespace Match
             battles.Add(opponent, new List<Battle>());
 
             isBattleNow = false;
+
+            battleStatus = new Dictionary<Player, BattleStatus>();
+
+            battleStatus.Add(mainPlayer, BattleStatus.NO_BATTLE);
+            battleStatus.Add(opponent, BattleStatus.NO_BATTLE);
         }
 
         private void ChangeMove()
@@ -89,10 +103,10 @@ namespace Match
 
             board.SpawnCharacter(newCharacter, cell);
 
-            // Checking if the battle is started
             List<Character> characters = board.GetCharactersOnCell(cell);
 
-            if (characters.Count > 1)
+            // Checking if the battle is already going
+            if (characters.Count > 2)
             {
                 // Finding all the enemies
                 List<Character> enemies = new List<Character>();
@@ -113,17 +127,49 @@ namespace Match
                     battles[currOpponent].Add(new BattleImpl(
                         cell, currOpponent, enemy, currPlayer, newCharacter));
                 }
-
-                // If the first battle was started - draw the battle start
-                if (characters.Count == 2)
-                {
-                    isBattleNow = true;
-                    board.StartBattle(cell);
-                    cell.SetState(CellState.BATTLED);
-                }
+            }
+            // If the first battle was started - start the battle
+            else if (characters.Count == 2)
+            {
+                StartBattle(cell);
             }
 
             ChangeMove();
+        }
+
+        // Starting the battle with two characters on cell
+        private void StartBattle(Cell cell)
+        {
+            // Getting the characters
+            List<Character> characters = board.GetCharactersOnCell(cell);
+
+            if (characters.Count != 2)
+            {
+                throw new InvalidOperationException(
+                    "Incorrect battle creation: more than 2 characters");
+            }
+
+            bool firstIsPlayer = characters[0].GetPlayer() == currPlayer;
+
+            Character playerChr = firstIsPlayer ? characters[0] : characters[1];
+            Character opponentChr = firstIsPlayer ? characters[1] : characters[0];
+
+            // Creating the battles
+            battles[currPlayer].Add(new BattleImpl(
+                cell, currPlayer, playerChr, currOpponent, opponentChr));
+
+            battles[currOpponent].Add(new BattleImpl(
+                cell, currOpponent, opponentChr, currPlayer, playerChr));
+
+            // Starting the battle
+            isBattleNow = true;
+
+            battleStatus[currPlayer] = BattleStatus.NO_CARDS_PLAYED;
+            battleStatus[currOpponent] = BattleStatus.NO_CARDS_PLAYED;
+
+            OpenCell(cell);
+
+            board.StartBattle(cell);
         }
 
         public void ChangeCellEffect(Cell cell, Dictionary<StuffClass, int> effect)
@@ -162,8 +208,10 @@ namespace Match
 
         public void FinishBattle(Player winner)
         {
+            Cell cell = battles[currPlayer][0].GetCell();
+
             // Drawing the battle finishing
-            board.FinishBattle(battles[currPlayer][0].GetCell(), winner);
+            board.FinishBattle(cell, winner);
 
             // Removing the characters
             HashSet<Character> winnerChars = new HashSet<Character>();
@@ -208,6 +256,20 @@ namespace Match
                     board.DestroyCharacter(character);
                 }
             }
+
+            // Closing the cell
+            board.RemoveCell(cell);
+
+            // Finishing the battles
+            isBattleNow = false;
+
+            foreach (var pair in battles)
+            {
+                pair.Value.Clear();
+            }
+
+            battleStatus[currPlayer] = BattleStatus.NO_BATTLE;
+            battleStatus[currOpponent] = BattleStatus.NO_BATTLE;
         }
 
         public void PlayCard(Card card)
@@ -217,6 +279,23 @@ namespace Match
                 foreach (Battle battle in battles[currPlayer])
                 {
                     card.Act(battle, this);
+                }
+
+                // Changing the battle status
+                if (card.GetCardType() == CardType.SILVER)
+                {
+                    if (battleStatus[currPlayer] == BattleStatus.NO_CARDS_PLAYED)
+                    {
+                        battleStatus[currPlayer] = BattleStatus.ONE_CARD_PLAYED;
+                    }
+                    else if (battleStatus[currPlayer] == BattleStatus.ONE_CARD_PLAYED)
+                    {
+                        battleStatus[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
+                    }
+                }
+                else if (card.GetCardType() == CardType.GOLD)
+                {
+                    battleStatus[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
                 }
 
                 ChangeMove();
@@ -244,7 +323,7 @@ namespace Match
 
         public bool IsBattleNow()
         {
-            return battles[currPlayer].Count != 0;
+            return isBattleNow;
         }
 
         public void MoveCharacter(Character character, Cell cell)
@@ -254,7 +333,21 @@ namespace Match
 
         public void OpenCell(Cell cell)
         {
-            throw new NotImplementedException();
+            cell.SetState(CellState.BATTLED);
+
+            List<Character> characters = board.GetCharactersOnCell(cell);
+
+            // Adding the effect to characters
+            foreach (var pair in cell.GetEffect())
+            {
+                foreach (Character character in characters)
+                {
+                    if (character.GetStuffClass() == pair.Key)
+                    {
+                        character.ChangePower(pair.Value);
+                    }
+                }
+            }
         }
 
         public void SetAfterBattleAction(Action<Player> action)

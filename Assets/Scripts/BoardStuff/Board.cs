@@ -6,8 +6,6 @@ namespace BoardStuff
 {
     public interface Board
     {
-        Board GetBoard();
-
         List<Character> GetAllCharacters();
 
         List<Cell> GetAllCells();
@@ -29,5 +27,7 @@ namespace BoardStuff
         Cell GetCharacterCell(Character character);
 
         void MoveCharacterToCell(Character character, Cell cell);
+
+        void RemoveCell(Cell cell);
     }
 }
