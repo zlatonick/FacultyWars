@@ -16,10 +16,8 @@ namespace BoardStuff
 
         void SetBlock(bool blocked);
 
-        Dictionary<StuffClass, int> GetEffect();
+        CellEffect GetEffect();
 
-        void Redraw(Dictionary<StuffClass, int> effect);
-
-        bool IsNeighbourTo(int cellId);
+        void Redraw(CellEffect effect);
     }
 }

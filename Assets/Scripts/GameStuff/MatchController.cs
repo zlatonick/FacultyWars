@@ -27,7 +27,7 @@ namespace GameStuff
 
         void SetNextTurnPlayer(Player player);
 
-        void ChangeCellEffect(Cell cell, Dictionary<StuffClass, int> effect);
+        void ChangeCellEffect(Cell cell, CellEffect effect);
 
         void OpenCell(Cell cell);
     }

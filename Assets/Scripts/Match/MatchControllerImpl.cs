@@ -9,11 +9,11 @@ using UnityEngine;
 
 namespace Match
 {   
-    public class MatchControllerImpl : MonoBehaviour, MatchController
+    public class MatchControllerImpl : MatchController
     {
         // Match info
 
-        public Board board;
+        private Board board;
 
         Dictionary<Player, PlayerInfo> playersInfo;
 
@@ -38,8 +38,10 @@ namespace Match
         CheckFactory checkFactory;
 
         // Start is called before the first frame update
-        void Start()
+        public MatchControllerImpl(Board board)
         {
+            this.board = board;
+
             // Creating the players
             Player mainPlayer = new Player(0, StuffPack.stuffClass);
 
@@ -172,36 +174,32 @@ namespace Match
             board.StartBattle(cell);
         }
 
-        public void ChangeCellEffect(Cell cell, Dictionary<StuffClass, int> effect)
+        public void ChangeCellEffect(Cell cell, CellEffect effect)
         {
             // Redrawing the cell
-            Dictionary<StuffClass, int> oldEffect = cell.GetEffect();
+            CellEffect oldEffect = cell.GetEffect();
 
             cell.Redraw(effect);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
 
             // Removing the old effect
-            foreach (var pair in oldEffect)
+            foreach (Character character in characters)
             {
-                foreach (Character character in characters)
+                if (oldEffect.CheckEffect(character.GetStuffClass()))
                 {
-                    if (character.GetStuffClass() == pair.Key)
-                    {
-                        character.ChangePower(-pair.Value);
-                    }
+                    character.ChangePower(
+                        -oldEffect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }
 
             // Adding the new effect
-            foreach (var pair in effect)
+            foreach(Character character in characters)
             {
-                foreach (Character character in characters)
+                if (effect.CheckEffect(character.GetStuffClass()))
                 {
-                    if (character.GetStuffClass() == pair.Key)
-                    {
-                        character.ChangePower(pair.Value);
-                    }
+                    character.ChangePower(
+                        effect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }
         }
@@ -338,14 +336,14 @@ namespace Match
             List<Character> characters = board.GetCharactersOnCell(cell);
 
             // Adding the effect to characters
-            foreach (var pair in cell.GetEffect())
+            CellEffect effect = cell.GetEffect();
+
+            foreach (Character character in characters)
             {
-                foreach (Character character in characters)
+                if (effect.CheckEffect(character.GetStuffClass()))
                 {
-                    if (character.GetStuffClass() == pair.Key)
-                    {
-                        character.ChangePower(pair.Value);
-                    }
+                    character.ChangePower(
+                        effect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }
         }

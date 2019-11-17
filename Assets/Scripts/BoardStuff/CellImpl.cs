@@ -1,76 +1,138 @@
-﻿using UnityEngine;
+﻿using System;
 using MetaInfo;
-using System.Collections.Generic;
 
 namespace BoardStuff
 {    public class CellImpl : Cell
     {
-        private int Id;
+        private int id;
 
-        private Dictionary<StuffClass, int> Effect;
+        private CellEffect effect;
 
-        private CellState State;
+        private CellState state;
 
-        private bool Blocked;
+        private bool blocked;
 
-        private GameObject CellObject;
+        private CellManager cellManager;
 
-        public CellImpl(int id, GameObject cellObject)
+        public CellImpl(int id, CellManager cellManager)
         {
-            Id = id;
-            Effect = GetRandomEffect();
-            CellObject = cellObject;
-            Blocked = false;
-            State = CellState.CLOSED;
+            this.id = id;
+            this.cellManager = cellManager;
 
-            CellObject.SetActive(true);
+            effect = GetRandomEffect();
+            blocked = false;
+            state = CellState.CLOSED;
         }
 
-        private Dictionary<StuffClass, int> GetRandomEffect()
+        private static int GetRandomEffectPower(Random random)
         {
-            Dictionary<StuffClass, int> result = new Dictionary<StuffClass, int>();
-
-            return result;
+            if (random.Next(2) == 0)
+            {
+                return random.Next(1, 3) * 10;
+            }
+            else
+            {
+                return -random.Next(1, 3) * 10;
+            }
         }
 
-        public Dictionary<StuffClass, int> GetEffect()
+        private static CellEffect GetRandomEffect()
         {
-            return Effect;
+            /*
+             * Generating a random cell effect
+             * 50% - cell has two effects
+             * 40% - cell has one effect
+             * 10% - cell has no effects
+             * Every effect and its value is chosen randomly with equal probabilities
+             */
+
+            Random random = new Random();
+
+            int effectsQuan = random.Next(10);
+
+            if (effectsQuan < 5)
+            {
+                int stuffInt = random.Next(3);
+
+                int[] numbers = new int[2];
+                int index = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (i != stuffInt)
+                    {
+                        numbers[index] = i;
+                        index++;
+                    }
+                }
+
+                int stuffInt2 = numbers[random.Next(2)];
+
+                return new CellEffect((StuffClass)stuffInt, GetRandomEffectPower(random),
+                    (StuffClass)stuffInt2, GetRandomEffectPower(random));
+            }
+            else if (effectsQuan < 9)
+            {
+                return new CellEffect((StuffClass)random.Next(3), GetRandomEffectPower(random));
+            }
+            else
+            {
+                return new CellEffect();
+            }
+        }
+
+        public CellEffect GetEffect()
+        {
+            return effect;
         }
 
         public int getId()
         {
-            return Id;
+            return id;
         }
 
         public CellState GetState()
         {
-            return State;
+            return state;
         }
 
         public bool IsBlocked()
         {
-            return Blocked;
+            return blocked;
         }
 
         public void SetBlock(bool blocked)
         {
-            Blocked = blocked;
+            this.blocked = blocked;
         }
 
-        public void SetState(CellState state)
+        public void SetState(CellState newState)
         {
-            State = state;
+            if (state == CellState.CLOSED)
+            {
+                if (newState == CellState.BATTLED || newState == CellState.OPENED)
+                {
+                    cellManager.ChangeCellPrefab(id, true);
+                }
+            }
+            else
+            {
+                state = newState;
+            }
         }
 
-        public bool IsNeighbourTo(int cellId)
+        public void Redraw(CellEffect effect)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void Redraw(Dictionary<StuffClass, int> effect)
-        {
-            throw new System.NotImplementedException();
+            cellManager.RemoveEffect(id);
+            
+            if (effect.EffectsQuan == 1)
+            {
+                cellManager.SetEffect(id, effect.StuffClass, effect.Power);
+            }
+            else
+            {
+                cellManager.SetEffect(id, effect.StuffClass, effect.Power,
+                    effect.StuffClass2, effect.Power2);
+            }
         }
     }
 }
