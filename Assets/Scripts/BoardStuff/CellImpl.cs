@@ -85,7 +85,7 @@ namespace BoardStuff
             return effect;
         }
 
-        public int getId()
+        public int GetId()
         {
             return id;
         }

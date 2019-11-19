@@ -5,7 +5,7 @@ namespace BoardStuff
 {
     public interface Cell
     {
-        int getId();
+        int GetId();
 
         CellState GetState();
 

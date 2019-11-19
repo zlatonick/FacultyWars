@@ -33,8 +33,6 @@ namespace Match
 
         // Factories
 
-        CharacterFactory characterFactory;
-
         CheckFactory checkFactory;
 
         // Start is called before the first frame update
@@ -72,7 +70,6 @@ namespace Match
             }
 
             // Creating the factories
-            characterFactory = new CharacterFactory();
             checkFactory = new CheckFactoryImpl();
 
             // Creating the battles
@@ -97,13 +94,26 @@ namespace Match
             currOpponent = temp;
         }
 
+        private void ChangePowerSafe(Character character, int changeBy)
+        {
+            int currPower = character.GetPower();
+
+            if (currPower + changeBy > 0)
+            {
+                character.ChangePower(changeBy);
+            }
+            else
+            {
+                character.ChangePower(-currPower);
+                board.DestroyCharacter(character);
+            }
+        }
+
         public void PlaceCheck(Check check, Cell cell)
         {
             // Spawning the character
-            Character newCharacter = characterFactory.CreateCharacter(
-                check.GetStuffClass(), check.GetPower(), currPlayer);
-
-            board.SpawnCharacter(newCharacter, cell);
+            Character newCharacter = board.SpawnCharacter(
+                check.GetStuffClass(), check.GetPower(), currPlayer, cell);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
 
@@ -188,7 +198,7 @@ namespace Match
             {
                 if (oldEffect.CheckEffect(character.GetStuffClass()))
                 {
-                    character.ChangePower(
+                    ChangePowerSafe(character,
                         -oldEffect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }
@@ -198,7 +208,7 @@ namespace Match
             {
                 if (effect.CheckEffect(character.GetStuffClass()))
                 {
-                    character.ChangePower(
+                    ChangePowerSafe(character,
                         effect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }
@@ -342,7 +352,7 @@ namespace Match
             {
                 if (effect.CheckEffect(character.GetStuffClass()))
                 {
-                    character.ChangePower(
+                    ChangePowerSafe(character,
                         effect.GetStuffClassPower(character.GetStuffClass()));
                 }
             }

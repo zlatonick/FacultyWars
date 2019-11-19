@@ -6,6 +6,8 @@ namespace BoardStuff
 {
     public interface Character
     {
+        int GetId();
+
         int GetPower();
 
         int GetStartPower();

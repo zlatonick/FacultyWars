@@ -87,11 +87,6 @@ namespace BoardStuff
             cellEffects = new Dictionary<int, CellEffect>();
 
             cellPositions = new Dictionary<int, Vector3>();
-
-            cellPositions.Add(0, new Vector3(-3.5347f, 1.7574f, -6));
-            cellPositions.Add(1, new Vector3(-4.207f, -1.75f, -6));
-            cellPositions.Add(2, new Vector3(-0.964f, 1.758f, -6));
-            cellPositions.Add(3, new Vector3(-1.625f, -1.75f, -6));
         }
 
         private static bool IsDark(int cellId)
@@ -138,6 +133,15 @@ namespace BoardStuff
 
         public void SetStartPosition(int cellsQuan)
         {
+            // Initializing the storage of cell coordinates
+            cellPositions.Clear();
+
+            for (int i = 0; i < cellsQuan; i++)
+            {
+                cellPositions.Add(i, BoardCoordinates.GetCellCoords(i));
+            }
+
+            // Creating the prefabs
             for (int i = 0; i < cellsQuan; i++)
             {
                 if (IsDark(i))
@@ -189,10 +193,14 @@ namespace BoardStuff
         {
             Vector3 cellPos = cellPositions[cellId];
 
-            Vector3 facultyPos = new Vector3(cellPos.x - 0.7f, cellPos.y, -7);
-            Vector3 signPos = new Vector3(cellPos.x + 0.1f, cellPos.y, -7);
-            Vector3 firstDigitPos = new Vector3(cellPos.x + 0.45f, cellPos.y, -7);
-            Vector3 secondDigitPos = new Vector3(cellPos.x + 0.75f, cellPos.y, -7);
+            Vector3 facultyPos = new Vector3(
+                cellPos.x - 0.272f * BoardCoordinates.cellWidth, cellPos.y, -7.5f);
+            Vector3 signPos = new Vector3(
+                cellPos.x + 0.0388f * BoardCoordinates.cellWidth, cellPos.y, -7.5f);
+            Vector3 firstDigitPos = new Vector3(
+                cellPos.x + 0.1747f * BoardCoordinates.cellWidth, cellPos.y, -7.5f);
+            Vector3 secondDigitPos = new Vector3(
+                cellPos.x + 0.2913f * BoardCoordinates.cellWidth, cellPos.y, -7.5f);
 
             Transform stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
                 facultyPos, Quaternion.identity);
@@ -206,20 +214,21 @@ namespace BoardStuff
                 signIcon, firstDigitIcon, secondDigitIcon));
         }
 
+        // TODO: Rewrite for relative coordinates
         public void SetEffect(int cellId, StuffClass stuffClass, int power,
             StuffClass stuffClass2, int power2)
         {
             Vector3 cellPos = cellPositions[cellId];
 
-            Vector3 facultyPos = new Vector3(cellPos.x - 0.5f, cellPos.y + 0.85f, -7);
-            Vector3 signPos = new Vector3(cellPos.x + 0.3f, cellPos.y + 0.85f, -7);
-            Vector3 firstDigitPos = new Vector3(cellPos.x + 0.65f, cellPos.y + 0.85f, -7);
-            Vector3 secondDigitPos = new Vector3(cellPos.x + 0.95f, cellPos.y + 0.85f, -7);
+            Vector3 facultyPos = new Vector3(cellPos.x - 0.5f, cellPos.y + 0.85f, -7.5f);
+            Vector3 signPos = new Vector3(cellPos.x + 0.3f, cellPos.y + 0.85f, -7.5f);
+            Vector3 firstDigitPos = new Vector3(cellPos.x + 0.65f, cellPos.y + 0.85f, -7.5f);
+            Vector3 secondDigitPos = new Vector3(cellPos.x + 0.95f, cellPos.y + 0.85f, -7.5f);
 
-            Vector3 facultyPos2 = new Vector3(cellPos.x - 0.85f, cellPos.y - 0.85f, -7);
-            Vector3 signPos2 = new Vector3(cellPos.x - 0.05f, cellPos.y - 0.85f, -7);
-            Vector3 firstDigitPos2 = new Vector3(cellPos.x + 0.3f, cellPos.y - 0.85f, -7);
-            Vector3 secondDigitPos2 = new Vector3(cellPos.x + 0.6f, cellPos.y - 0.85f, -7);
+            Vector3 facultyPos2 = new Vector3(cellPos.x - 0.85f, cellPos.y - 0.85f, -7.5f);
+            Vector3 signPos2 = new Vector3(cellPos.x - 0.05f, cellPos.y - 0.85f, -7.5f);
+            Vector3 firstDigitPos2 = new Vector3(cellPos.x + 0.3f, cellPos.y - 0.85f, -7.5f);
+            Vector3 secondDigitPos2 = new Vector3(cellPos.x + 0.6f, cellPos.y - 0.85f, -7.5f);
 
             Transform stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
                 facultyPos, Quaternion.identity);

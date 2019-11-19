@@ -6,11 +6,15 @@ namespace BoardStuff
 {
     public class BoardController : MonoBehaviour, Board
     {
-        private Dictionary<Cell, List<Character>> cells;
-
         public CellManager cellManager;
 
-        const int CELLS_QUAN = 4;
+        public CharacterManager characterManager;
+
+        private Dictionary<Cell, List<Character>> cells;
+
+        private CharacterFactory characterFactory;
+
+        const int CELLS_QUAN = 8;
 
         // Start is called before the first frame update
         void Start()
@@ -26,11 +30,14 @@ namespace BoardStuff
                 Cell cell = new CellImpl(i, cellManager);
                 cells.Add(cell, new List<Character>());
             }
+
+            // Creating character factory
+            characterFactory = new CharacterFactory(characterManager);
         }
 
         public void DestroyCharacter(Character character)
         {
-            throw new System.NotImplementedException();
+            characterManager.RemoveCharacter(character.GetId());
         }
 
         public void FinishBattle(Cell cell, Player winner)
@@ -53,11 +60,6 @@ namespace BoardStuff
             }
 
             return result;
-        }
-
-        public Cell GetCellById(int id)
-        {
-            throw new System.NotImplementedException();
         }
 
         public Cell GetCharacterCell(Character character)
@@ -85,7 +87,7 @@ namespace BoardStuff
 
         public void RemoveCell(Cell cell)
         {
-            throw new System.NotImplementedException();
+            cellManager.RemoveCell(cell.GetId());
         }
 
         public void ReturnCharacter(Character character)
@@ -93,9 +95,14 @@ namespace BoardStuff
             throw new System.NotImplementedException();
         }
 
-        public void SpawnCharacter(Character character, Cell cell)
+        public Character SpawnCharacter(StuffClass stuffClass, int power, Player player, Cell cell)
         {
-            throw new System.NotImplementedException();
+            Character character = characterFactory.CreateCharacter(stuffClass, power, player);
+
+            characterManager.SpawnCharacter(cell.GetId(), character.GetId(),
+                stuffClass, power, player.id == 0);     // Main player has id = 0
+
+            return character;
         }
 
         public void StartBattle(Cell cell)

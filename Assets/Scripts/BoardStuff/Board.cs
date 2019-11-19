@@ -10,9 +10,7 @@ namespace BoardStuff
 
         List<Cell> GetAllCells();
 
-        Cell GetCellById(int id);
-
-        void SpawnCharacter(Character character, Cell cell);
+        Character SpawnCharacter(StuffClass stuffClass, int power, Player player, Cell cell);
 
         void DestroyCharacter(Character character);
 
