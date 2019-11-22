@@ -3,77 +3,92 @@ using System.Collections.Generic;
 using GameStuff;
 using MetaInfo;
 
-public class PlayerController : PlayerInfo
+namespace Match
 {
-    StuffClass stuffClass;
-
-    List<Card> cards;
-
-    List<Check> checks;
-
-    List<Card> cardsPlayed;
-
-    List<Check> checksDead;
-
-    List<int> battlesHistory;
-
-    public PlayerController(StuffClass stuffClass, List<Card> cards, List<Check> checks)
+    public class PlayerController : PlayerInfo
     {
-        this.stuffClass = stuffClass;
-        this.checks = checks;
-        this.cards = cards;
-        cardsPlayed = new List<Card>();
-        checksDead = new List<Check>();
-        battlesHistory = new List<int>();
-    }
+        StuffClass stuffClass;
 
-    public void AddCardToHand(Card card)
-    {
-        cards.Add(card);
-    }
+        Dictionary<int, Card> cards;
 
-    public void AddCheckToHand(Check check)
-    {
-        checks.Add(check);
-    }
+        List<Check> checks;
 
-    public List<int> GetBattlesHistory()
-    {
-        return battlesHistory;
-    }
+        List<Card> cardsPlayed;
 
-    public List<Card> GetCardsInHand()
-    {
-        return cards;
-    }
+        List<Check> checksDead;
 
-    public List<Card> GetCardsPlayed()
-    {
-        return cardsPlayed;
-    }
+        List<int> battlesHistory;
 
-    public List<Check> GetChecksDead()
-    {
-        return checksDead;
-    }
+        CardsManager cardsManager;
 
-    public List<Check> GetChecksInHand()
-    {
-        return checks;
-    }
+        public PlayerController(StuffClass stuffClass, CardsManager cardsManager)
+        {
+            this.stuffClass = stuffClass;
+            this.cardsManager = cardsManager;
 
-    public void RemoveCardFromHand(Card card)
-    {
-        cards.Remove(card);
-    }
+            cards = new Dictionary<int, Card>();
+            checks = new List<Check>();
+            cardsPlayed = new List<Card>();
+            checksDead = new List<Check>();
+            battlesHistory = new List<int>();
+        }
 
-    public void RemoveCheckFromHand(Check check)
-    {
-        checks.Remove(check);
-    }
+        public StuffClass GetStuffClass()
+        {
+            return stuffClass;
+        }
 
-    public void SetPlayingCardAction(Action<Card> action)
-    {
-        throw new NotImplementedException();
+        public void AddCardToHand(Card card)
+        {
+            int cardId = cardsManager.AddCard(
+                card.GetStuffClass(), card.GetCardType(), card.GetText());
+
+            cards.Add(cardId, card);
+        }
+
+        public void AddCheckToHand(Check check)
+        {
+            checks.Add(check);
+        }
+
+        public List<int> GetBattlesHistory()
+        {
+            return battlesHistory;
+        }
+
+        public List<Card> GetCardsInHand()
+        {
+            return new List<Card>(cards.Values);
+        }
+
+        public List<Card> GetCardsPlayed()
+        {
+            return cardsPlayed;
+        }
+
+        public List<Check> GetChecksDead()
+        {
+            return checksDead;
+        }
+
+        public List<Check> GetChecksInHand()
+        {
+            return checks;
+        }
+
+        public void RemoveCardFromHand(Card card)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveCheckFromHand(Check check)
+        {
+            checks.Remove(check);
+        }
+
+        public void SetPlayingCardAction(Action<Card> action)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

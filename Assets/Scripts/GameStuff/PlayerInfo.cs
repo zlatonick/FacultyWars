@@ -1,10 +1,13 @@
-﻿using System;
+﻿using MetaInfo;
+using System;
 using System.Collections.Generic;
 
 namespace GameStuff
 {
     public interface PlayerInfo
     {
+        StuffClass GetStuffClass();
+
         List<Card> GetCardsInHand();
 
         List<Check> GetChecksInHand();

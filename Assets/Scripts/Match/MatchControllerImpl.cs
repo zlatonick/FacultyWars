@@ -35,7 +35,6 @@ namespace Match
 
         CheckFactory checkFactory;
 
-        // Start is called before the first frame update
         public MatchControllerImpl(Board board)
         {
             this.board = board;
@@ -49,11 +48,11 @@ namespace Match
             // Setting the players info
             playersInfo = new Dictionary<Player, PlayerInfo>();
 
-            playersInfo.Add(mainPlayer, new PlayerController(
-                StuffPack.stuffClass, StuffPack.cards, StuffPack.checks));
+            //playersInfo.Add(mainPlayer, new PlayerController(
+            //    StuffPack.stuffClass, StuffPack.cards, StuffPack.checks));
 
-            playersInfo.Add(opponent, new PlayerController(
-                engine.GetStuffClass(), engine.GetCards(), engine.GetChecks()));
+            //playersInfo.Add(opponent, new PlayerController(
+            //    engine.GetStuffClass(), engine.GetCards(), engine.GetChecks()));
 
             // Choosing the first player
             System.Random random = new System.Random();
@@ -332,6 +331,11 @@ namespace Match
         public bool IsBattleNow()
         {
             return isBattleNow;
+        }
+
+        public void FinishMove()
+        {
+            throw new NotImplementedException();
         }
 
         public void MoveCharacter(Character character, Cell cell)

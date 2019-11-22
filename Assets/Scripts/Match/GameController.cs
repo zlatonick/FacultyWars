@@ -1,18 +1,23 @@
-﻿using UnityEngine;
+﻿using GameStuff;
+using UnityEngine;
 
 namespace Match
 {
     public class GameController : MonoBehaviour
     {
-
-        public Transform cellPrefab;
+        private MatchController matchController;
 
         void Start()
         {
-            
+             
         }
 
-        private void CreateCells()
+        void StartPlayerTurn()
+        {
+
+        }
+
+        void PutCharacterOnCell(int power, int cellId)
         {
 
         }

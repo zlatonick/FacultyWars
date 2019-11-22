@@ -8,7 +8,7 @@ namespace GameStuff
 
         StuffClass GetStuffClass();
 
-        string GetName();
+        string GetText();
 
         bool IsChoosing();
 

@@ -15,6 +15,8 @@ namespace GameStuff
 
         bool IsBattleNow();
 
+        void FinishMove();
+
         void PlaceCheck(Check check, Cell cell);
 
         void SetAfterBattleAction(Action<Player> action);
