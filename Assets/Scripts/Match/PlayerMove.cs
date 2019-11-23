@@ -5,7 +5,7 @@ namespace GameEngine
 {
     public class PlayerMove
     {
-        public Check Check;
+        public Check check;
 
         public Cell cell;
     }

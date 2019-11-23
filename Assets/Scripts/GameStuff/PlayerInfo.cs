@@ -6,8 +6,6 @@ namespace GameStuff
 {
     public interface PlayerInfo
     {
-        StuffClass GetStuffClass();
-
         List<Card> GetCardsInHand();
 
         List<Check> GetChecksInHand();
@@ -27,5 +25,11 @@ namespace GameStuff
         void RemoveCardFromHand(Card card);
 
         void SetPlayingCardAction(Action<Card> action);
+
+        void SetActionsPermission(bool permission);
+
+        void SetAllowedCardTypes(CardType cardType);
+
+        void SetAllowedCharacters(bool allowed);
     }
 }

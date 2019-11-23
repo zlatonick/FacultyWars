@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Match
+namespace BoardStuff
 {
     public class BoardClickHandler : MonoBehaviour
     {

@@ -11,11 +11,17 @@ namespace GameStuff
 
         List<Cell> GetAllCells();
 
-        PlayerInfo GetPlayerInfo(Player player);
+        Player GetCurrMovingPlayer();
+
+        CardType GetAllowedCardTypes();
+
+        bool AreCharactersAllowed();
 
         bool IsBattleNow();
 
         void FinishMove();
+
+        void PlayCard(Card card);
 
         void PlaceCheck(Check check, Cell cell);
 
@@ -27,10 +33,10 @@ namespace GameStuff
 
         void MoveCharacter(Character character, Cell cell);
 
-        void SetNextTurnPlayer(Player player);
+        void ChangePlayersAfterMoveFinished(bool change);
 
         void ChangeCellEffect(Cell cell, CellEffect effect);
 
-        void OpenCell(Cell cell);
+        void OpenCell(Cell cell, CellState newState);
     }
 }

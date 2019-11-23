@@ -8,9 +8,7 @@ namespace GameEngine
     {
         StuffClass GetStuffClass();
 
-        List<Card> GetCards();
-
-        List<Check> GetChecks();
+        PlayerInfo GetPlayerInfo();
 
         PlayerMove MakeMove();
 

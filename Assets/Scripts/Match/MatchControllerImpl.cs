@@ -1,11 +1,8 @@
 ﻿using BoardStuff;
-using GameEngine;
 using GameStuff;
 using MetaInfo;
-using Preparing;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Match
 {   
@@ -23,50 +20,48 @@ namespace Match
 
         Player currOpponent;
 
+        bool changePlayersAfterMoveFinished;
+
         // Battle info
 
         bool isBattleNow;
 
         Dictionary<Player, List<Battle>> battles;
 
-        Dictionary<Player, BattleStatus> battleStatus;
+        Dictionary<Player, List<Character>> battleCharacters;
+
+        Dictionary<Player, BattleStatus> battleStatuses;
 
         // Factories
 
         CheckFactory checkFactory;
 
-        public MatchControllerImpl(Board board)
+        public MatchControllerImpl(Board board, Player player1, PlayerInfo playerInfo1,
+            Player player2, PlayerInfo playerInfo2)
         {
             this.board = board;
-
-            // Creating the players
-            Player mainPlayer = new Player(0, StuffPack.stuffClass);
-
-            Engine engine = EngineCreator.CreateEngine();   // Versus AI
-            Player opponent = new Player(1, engine.GetStuffClass());
 
             // Setting the players info
             playersInfo = new Dictionary<Player, PlayerInfo>();
 
-            //playersInfo.Add(mainPlayer, new PlayerController(
-            //    StuffPack.stuffClass, StuffPack.cards, StuffPack.checks));
-
-            //playersInfo.Add(opponent, new PlayerController(
-            //    engine.GetStuffClass(), engine.GetCards(), engine.GetChecks()));
+            playersInfo.Add(player1, playerInfo1);
+            playersInfo.Add(player2, playerInfo2);
 
             // Choosing the first player
             System.Random random = new System.Random();
 
             if (random.Next(0, 2) == 0)
             {
-                currPlayer = mainPlayer;
-                currOpponent = opponent;
+                currPlayer = player1;
+                currOpponent = player2;
             }
             else
             {
-                currPlayer = opponent;
-                currOpponent = mainPlayer;
+                currPlayer = player2;
+                currOpponent = player1;
             }
+
+            changePlayersAfterMoveFinished = true;
 
             // Creating the factories
             checkFactory = new CheckFactoryImpl();
@@ -74,23 +69,35 @@ namespace Match
             // Creating the battles
             battles = new Dictionary<Player, List<Battle>>();
 
-            battles.Add(mainPlayer, new List<Battle>());
-            battles.Add(opponent, new List<Battle>());
+            battles.Add(player1, new List<Battle>());
+            battles.Add(player2, new List<Battle>());
+
+            battleCharacters = new Dictionary<Player, List<Character>>();
+
+            battleCharacters.Add(player1, new List<Character>());
+            battleCharacters.Add(player2, new List<Character>());
 
             isBattleNow = false;
 
-            battleStatus = new Dictionary<Player, BattleStatus>();
+            battleStatuses = new Dictionary<Player, BattleStatus>();
 
-            battleStatus.Add(mainPlayer, BattleStatus.NO_BATTLE);
-            battleStatus.Add(opponent, BattleStatus.NO_BATTLE);
+            battleStatuses.Add(player1, BattleStatus.NO_BATTLE);
+            battleStatuses.Add(player2, BattleStatus.NO_BATTLE);
         }
 
         private void ChangeMove()
         {
-            Player temp = currPlayer;
+            if (changePlayersAfterMoveFinished)
+            {
+                Player temp = currPlayer;
 
-            currPlayer = currOpponent;
-            currOpponent = temp;
+                currPlayer = currOpponent;
+                currOpponent = temp;
+            }
+            else
+            {
+                changePlayersAfterMoveFinished = true;
+            }
         }
 
         private void ChangePowerSafe(Character character, int changeBy)
@@ -114,73 +121,99 @@ namespace Match
             Character newCharacter = board.SpawnCharacter(
                 check.GetStuffClass(), check.GetPower(), currPlayer, cell);
 
-            List<Character> characters = board.GetCharactersOnCell(cell);
-
-            // Checking if the battle is already going
-            if (characters.Count > 2)
+            if (cell.GetState() == CellState.OPENED ||
+                cell.GetState() == CellState.BATTLED)
             {
-                // Finding all the enemies
-                List<Character> enemies = new List<Character>();
-
-                foreach (Character character in characters)
-                {
-                    if (character.GetPlayer() == currOpponent)
-                    {
-                        enemies.Add(character);
-                    }
-                }
-
-                // Starting the battles
-                foreach (Character enemy in enemies)
-                {
-                    battles[currPlayer].Add(new BattleImpl(
-                        cell, currPlayer, newCharacter, currOpponent, enemy));
-                    battles[currOpponent].Add(new BattleImpl(
-                        cell, currOpponent, enemy, currPlayer, newCharacter));
-                }
+                AddCellEffectToCharacter(newCharacter, cell.GetEffect());
             }
-            // If the first battle was started - start the battle
-            else if (characters.Count == 2)
-            {
-                StartBattle(cell);
-            }
+
+            CheckBattlesWithNewCharacter(newCharacter, cell);
 
             ChangeMove();
         }
 
-        // Starting the battle with two characters on cell
-        private void StartBattle(Cell cell)
+        private void CheckBattlesWithNewCharacter(Character newCharacter, Cell cell)
         {
-            // Getting the characters
+            Player charPlayer = newCharacter.GetPlayer();
+            Player charOpponent = charPlayer == currPlayer ? currOpponent : currPlayer;
+
             List<Character> characters = board.GetCharactersOnCell(cell);
 
-            if (characters.Count != 2)
+            // Finding all the enemies
+            List<Character> enemies = new List<Character>();
+
+            foreach (Character character in characters)
             {
-                throw new InvalidOperationException(
-                    "Incorrect battle creation: more than 2 characters");
+                if (character.GetPlayer() == charOpponent)
+                {
+                    enemies.Add(character);
+                }
             }
 
-            bool firstIsPlayer = characters[0].GetPlayer() == currPlayer;
+            // Checking if there are some enemies on the cell
+            if (enemies.Count > 0)
+            {
+                // Checking if battle is already going
+                if (characters.Count > enemies.Count)
+                {
+                    // Adding character to the battle
+                    battleCharacters[charPlayer].Add(newCharacter);
 
-            Character playerChr = firstIsPlayer ? characters[0] : characters[1];
-            Character opponentChr = firstIsPlayer ? characters[1] : characters[0];
+                    // Starting the battles
+                    foreach (Character enemy in enemies)
+                    {
+                        battles[charPlayer].Add(new BattleImpl(
+                            cell, charPlayer, newCharacter, charOpponent, enemy));
+                        battles[charOpponent].Add(new BattleImpl(
+                            cell, charOpponent, enemy, charPlayer, newCharacter));
+                    }
+                }
+                // If the first battle was started - start the battle
+                else
+                {
+                    // Adding the characters to battle
+                    battleCharacters[charPlayer].Add(newCharacter);
+                    battleCharacters[charOpponent].AddRange(enemies);
 
-            // Creating the battles
-            battles[currPlayer].Add(new BattleImpl(
-                cell, currPlayer, playerChr, currOpponent, opponentChr));
+                    // Creating the battles
+                    foreach (Character enemy in enemies)
+                    {
+                        battles[charPlayer].Add(new BattleImpl(
+                            cell, charPlayer, newCharacter, charOpponent, enemy));
 
-            battles[currOpponent].Add(new BattleImpl(
-                cell, currOpponent, opponentChr, currPlayer, playerChr));
+                        battles[charOpponent].Add(new BattleImpl(
+                            cell, charOpponent, enemy, charPlayer, newCharacter));
+                    }
 
-            // Starting the battle
-            isBattleNow = true;
+                    // Starting the battle
+                    isBattleNow = true;
 
-            battleStatus[currPlayer] = BattleStatus.NO_CARDS_PLAYED;
-            battleStatus[currOpponent] = BattleStatus.NO_CARDS_PLAYED;
+                    battleStatuses[charPlayer] = BattleStatus.NO_CARDS_PLAYED;
+                    battleStatuses[charOpponent] = BattleStatus.NO_CARDS_PLAYED;
 
-            OpenCell(cell);
+                    OpenCell(cell, CellState.BATTLED);
 
-            board.StartBattle(cell);
+                    board.StartBattle(cell);
+                }
+            }
+        }
+
+        private void RemoveCellEffectFromCharacter(Character character, CellEffect effect)
+        {
+            if (effect.CheckEffect(character.GetStuffClass()))
+            {
+                ChangePowerSafe(character,
+                    -effect.GetStuffClassPower(character.GetStuffClass()));
+            }
+        }
+
+        private void AddCellEffectToCharacter(Character character, CellEffect effect)
+        {
+            if (effect.CheckEffect(character.GetStuffClass()))
+            {
+                ChangePowerSafe(character,
+                    effect.GetStuffClassPower(character.GetStuffClass()));
+            }
         }
 
         public void ChangeCellEffect(Cell cell, CellEffect effect)
@@ -195,21 +228,13 @@ namespace Match
             // Removing the old effect
             foreach (Character character in characters)
             {
-                if (oldEffect.CheckEffect(character.GetStuffClass()))
-                {
-                    ChangePowerSafe(character,
-                        -oldEffect.GetStuffClassPower(character.GetStuffClass()));
-                }
+                RemoveCellEffectFromCharacter(character, oldEffect);
             }
 
             // Adding the new effect
             foreach(Character character in characters)
             {
-                if (effect.CheckEffect(character.GetStuffClass()))
-                {
-                    ChangePowerSafe(character,
-                        effect.GetStuffClassPower(character.GetStuffClass()));
-                }
+                AddCellEffectToCharacter(character, effect);
             }
         }
 
@@ -221,26 +246,17 @@ namespace Match
             board.FinishBattle(cell, winner);
 
             // Removing the characters
-            HashSet<Character> winnerChars = new HashSet<Character>();
-            HashSet<Character> opponentChars = new HashSet<Character>();
-
-            foreach (Battle battle in battles[winner == null ? currPlayer : winner])
-            {
-                winnerChars.Add(battle.GetCharacter());
-                opponentChars.Add(battle.GetEnemyCharacter());
-            }
-
             if (winner == null)
             {
                 // Draw. Returning all the characters to hands
-                foreach (Character character in winnerChars)
+                foreach (Character character in battleCharacters[currPlayer])
                 {
                     board.ReturnCharacter(character);
                     playersInfo[currPlayer].AddCheckToHand(checkFactory.GetCheck(
                         character.GetStuffClass(), character.GetStartPower()));
                 }
 
-                foreach (Character character in opponentChars)
+                foreach (Character character in battleCharacters[currOpponent])
                 {
                     board.ReturnCharacter(character);
                     playersInfo[currOpponent].AddCheckToHand(checkFactory.GetCheck(
@@ -250,7 +266,7 @@ namespace Match
             else
             {
                 // Returning all the winner characters to his hand
-                foreach (Character character in winnerChars)
+                foreach (Character character in battleCharacters[winner])
                 {
                     board.ReturnCharacter(character);
                     playersInfo[winner].AddCheckToHand(checkFactory.GetCheck(
@@ -258,7 +274,8 @@ namespace Match
                 }
 
                 // Destroying all the loser characters
-                foreach (Character character in opponentChars)
+                Player looser = winner == currPlayer ? currOpponent : currPlayer;
+                foreach (Character character in battleCharacters[looser])
                 {
                     board.DestroyCharacter(character);
                 }
@@ -267,16 +284,22 @@ namespace Match
             // Closing the cell
             board.RemoveCell(cell);
 
-            // Finishing the battles
+            // Stopping the battle
+            StopBattle();
+        }
+
+        private void StopBattle()
+        {
             isBattleNow = false;
 
-            foreach (var pair in battles)
-            {
-                pair.Value.Clear();
-            }
+            battles[currPlayer].Clear();
+            battles[currOpponent].Clear();
 
-            battleStatus[currPlayer] = BattleStatus.NO_BATTLE;
-            battleStatus[currOpponent] = BattleStatus.NO_BATTLE;
+            battleCharacters[currPlayer].Clear();
+            battleCharacters[currOpponent].Clear();
+
+            battleStatuses[currPlayer] = BattleStatus.NO_BATTLE;
+            battleStatuses[currOpponent] = BattleStatus.NO_BATTLE;
         }
 
         public void PlayCard(Card card)
@@ -291,18 +314,18 @@ namespace Match
                 // Changing the battle status
                 if (card.GetCardType() == CardType.SILVER)
                 {
-                    if (battleStatus[currPlayer] == BattleStatus.NO_CARDS_PLAYED)
+                    if (battleStatuses[currPlayer] == BattleStatus.NO_CARDS_PLAYED)
                     {
-                        battleStatus[currPlayer] = BattleStatus.ONE_CARD_PLAYED;
+                        battleStatuses[currPlayer] = BattleStatus.ONE_CARD_PLAYED;
                     }
-                    else if (battleStatus[currPlayer] == BattleStatus.ONE_CARD_PLAYED)
+                    else if (battleStatuses[currPlayer] == BattleStatus.ONE_CARD_PLAYED)
                     {
-                        battleStatus[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
+                        battleStatuses[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
                     }
                 }
                 else if (card.GetCardType() == CardType.GOLD)
                 {
-                    battleStatus[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
+                    battleStatuses[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
                 }
 
                 ChangeMove();
@@ -323,11 +346,6 @@ namespace Match
             return board.GetAllCharacters();
         }
 
-        public PlayerInfo GetPlayerInfo(Player player)
-        {
-            return playersInfo[player];
-        }
-
         public bool IsBattleNow()
         {
             return isBattleNow;
@@ -335,30 +353,52 @@ namespace Match
 
         public void FinishMove()
         {
-            throw new NotImplementedException();
+            ChangeMove();
         }
 
         public void MoveCharacter(Character character, Cell cell)
         {
-            throw new NotImplementedException();
+            Cell oldCell = board.GetCharacterCell(character);
+
+            if (oldCell.GetState() != CellState.CLOSED)
+            {
+                // Removing old effect
+                RemoveCellEffectFromCharacter(character, oldCell.GetEffect());
+
+                // Checking if character is alive
+                if (board.GetCharacterCell(character) == null) return;
+
+                // Stopping the battle if it was
+                if (oldCell.GetState() == CellState.BATTLED)
+                {
+                    oldCell.SetState(CellState.OPENED);
+                    StopBattle();
+                }
+            }
+
+            // Moving the character
+            board.MoveCharacterToCell(character, cell);
+
+            // Checking the new cell
+            if (cell.GetState() == CellState.OPENED ||
+                cell.GetState() == CellState.BATTLED)
+            {
+                AddCellEffectToCharacter(character, cell.GetEffect());
+            }
+
+            CheckBattlesWithNewCharacter(character, cell);
         }
 
-        public void OpenCell(Cell cell)
+        public void OpenCell(Cell cell, CellState newState)
         {
-            cell.SetState(CellState.BATTLED);
+            cell.SetState(newState);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
 
             // Adding the effect to characters
-            CellEffect effect = cell.GetEffect();
-
             foreach (Character character in characters)
             {
-                if (effect.CheckEffect(character.GetStuffClass()))
-                {
-                    ChangePowerSafe(character,
-                        effect.GetStuffClassPower(character.GetStuffClass()));
-                }
+                AddCellEffectToCharacter(character, cell.GetEffect());
             }
         }
 
@@ -372,11 +412,44 @@ namespace Match
             throw new NotImplementedException();
         }
 
-        public void SetNextTurnPlayer(Player player)
+        public void ChangePlayersAfterMoveFinished(bool change)
         {
-            throw new NotImplementedException();
+            changePlayersAfterMoveFinished = change;
         }
 
+        public Player GetCurrMovingPlayer()
+        {
+            return currPlayer;
+        }
 
+        public CardType GetAllowedCardTypes()
+        {
+            if (isBattleNow)
+            {
+                BattleStatus battleStatus = battleStatuses[currPlayer];
+
+                if (battleStatus == BattleStatus.NO_CARDS_PLAYED)
+                {
+                    return CardType.GOLD;
+                }
+                else if (battleStatus == BattleStatus.ONE_CARD_PLAYED)
+                {
+                    return CardType.SILVER;
+                }
+                else
+                {
+                    return CardType.NEUTRAL;
+                }
+            }
+            else
+            {
+                return CardType.NEUTRAL;
+            }
+        }
+
+        public bool AreCharactersAllowed()
+        {
+            return !isBattleNow;
+        }
     }
 }

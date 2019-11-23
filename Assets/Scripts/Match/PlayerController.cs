@@ -7,8 +7,6 @@ namespace Match
 {
     public class PlayerController : PlayerInfo
     {
-        StuffClass stuffClass;
-
         Dictionary<int, Card> cards;
 
         List<Check> checks;
@@ -21,9 +19,8 @@ namespace Match
 
         CardsManager cardsManager;
 
-        public PlayerController(StuffClass stuffClass, CardsManager cardsManager)
+        public PlayerController(CardsManager cardsManager)
         {
-            this.stuffClass = stuffClass;
             this.cardsManager = cardsManager;
 
             cards = new Dictionary<int, Card>();
@@ -32,12 +29,7 @@ namespace Match
             checksDead = new List<Check>();
             battlesHistory = new List<int>();
         }
-
-        public StuffClass GetStuffClass()
-        {
-            return stuffClass;
-        }
-
+        
         public void AddCardToHand(Card card)
         {
             int cardId = cardsManager.AddCard(
@@ -87,6 +79,21 @@ namespace Match
         }
 
         public void SetPlayingCardAction(Action<Card> action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetActionsPermission(bool permission)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetAllowedCardTypes(CardType cardType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetAllowedCharacters(bool allowed)
         {
             throw new NotImplementedException();
         }
