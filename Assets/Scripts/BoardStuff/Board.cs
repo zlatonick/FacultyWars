@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MetaInfo;
+using UnityEngine;
 
 namespace BoardStuff
 {
@@ -26,5 +27,7 @@ namespace BoardStuff
         void MoveCharacterToCell(Character character, Cell cell);
 
         void RemoveCell(Cell cell);
+
+        Cell GetCellByCoords(Vector2 coords);
     }
 }

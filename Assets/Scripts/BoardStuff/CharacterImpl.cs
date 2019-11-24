@@ -18,19 +18,19 @@ namespace BoardStuff
 
         List<int> powerHistory;
 
-        CharacterManager characterManager;
+        BoardStuffManager boardStuffManager;
 
         List<Action<int>> changePowerActions;
 
         public CharacterImpl(int id, StuffClass stuffClass, int power,
-            Player player, CharacterManager characterManager)
+            Player player, BoardStuffManager boardStuffManager)
         {
             this.id = id;
             this.stuffClass = stuffClass;
             this.power = power;
             this.startPower = power;
             this.player = player;
-            this.characterManager = characterManager;
+            this.boardStuffManager = boardStuffManager;
 
             powerHistory = new List<int>();
             changePowerActions = new List<Action<int>>();
@@ -44,7 +44,7 @@ namespace BoardStuff
         public void ChangePower(int changeBy)
         {
             power += changeBy;
-            characterManager.ChangeCharacterPower(id, power);
+            boardStuffManager.ChangeCharacterPower(id, power);
 
             foreach (Action<int> action in changePowerActions)
             {

@@ -4,40 +4,37 @@ using UnityEngine;
 
 namespace BoardStuff
 {
-    public class BoardController : MonoBehaviour, Board
+    public class BoardController : Board
     {
-        public CellManager cellManager;
-
-        public CharacterManager characterManager;
+        private BoardStuffManager boardStuffManager;
 
         private Dictionary<Cell, List<Character>> cells;
 
         private CharacterFactory characterFactory;
 
-        const int CELLS_QUAN = 8;
-
-        // Start is called before the first frame update
-        void Start()
+        public BoardController(BoardStuffManager boardStuffManager, int cellsPairsQuan)
         {
+            this.boardStuffManager = boardStuffManager;
+
             // Creating all the cell prefabs
-            cellManager.SetStartPosition(CELLS_QUAN);
+            boardStuffManager.FillBoardWithCells(cellsPairsQuan);
 
             // Creating cell objects
             cells = new Dictionary<Cell, List<Character>>();
 
-            for (int i = 0; i < CELLS_QUAN; i++)
+            for (int i = 0; i < 2 * cellsPairsQuan; i++)
             {
-                Cell cell = new CellImpl(i, cellManager);
+                Cell cell = new CellImpl(i, boardStuffManager);
                 cells.Add(cell, new List<Character>());
             }
 
             // Creating character factory
-            characterFactory = new CharacterFactory(characterManager);
+            characterFactory = new CharacterFactory(boardStuffManager);
         }
 
         public void DestroyCharacter(Character character)
         {
-            characterManager.RemoveCharacter(character.GetId());
+            boardStuffManager.RemoveCharacter(character.GetId());
         }
 
         public void FinishBattle(Cell cell, Player winner)
@@ -87,7 +84,7 @@ namespace BoardStuff
 
         public void RemoveCell(Cell cell)
         {
-            cellManager.RemoveCell(cell.GetId());
+            boardStuffManager.RemoveCell(cell.GetId());
         }
 
         public void ReturnCharacter(Character character)
@@ -99,13 +96,18 @@ namespace BoardStuff
         {
             Character character = characterFactory.CreateCharacter(stuffClass, power, player);
 
-            characterManager.SpawnCharacter(cell.GetId(), character.GetId(),
+            boardStuffManager.SpawnCharacter(cell.GetId(), character.GetId(),
                 stuffClass, power, player.id == 0);     // Main player has id = 0
 
             return character;
         }
 
         public void StartBattle(Cell cell)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Cell GetCellByCoords(Vector2 coords)
         {
             throw new System.NotImplementedException();
         }

@@ -4,10 +4,10 @@ namespace GameStuff
 {
     public interface Check
     {
+        int GetLevel();
+
         int GetPower();
 
         StuffClass GetStuffClass();
-
-        void setPower(int newPower);
     }
 }

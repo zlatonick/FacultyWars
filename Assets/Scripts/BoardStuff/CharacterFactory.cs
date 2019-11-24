@@ -6,18 +6,18 @@ namespace BoardStuff
     {
         private int charactersCreated;
 
-        private CharacterManager characterManager;
+        private BoardStuffManager boardStuffManager;
 
-        public CharacterFactory(CharacterManager characterManager)
+        public CharacterFactory(BoardStuffManager boardStuffManager)
         {
-            this.characterManager = characterManager;
+            this.boardStuffManager = boardStuffManager;
             charactersCreated = 0;
         }
 
         public Character CreateCharacter(StuffClass stuffClass, int power, Player player)
         {
             return new CharacterImpl(charactersCreated++, stuffClass,
-                power, player, characterManager);
+                power, player, boardStuffManager);
         }
     }
 }

@@ -12,12 +12,12 @@ namespace BoardStuff
 
         private bool blocked;
 
-        private CellManager cellManager;
+        private BoardStuffManager boardStuffManager;
 
-        public CellImpl(int id, CellManager cellManager)
+        public CellImpl(int id, BoardStuffManager boardStuffManager)
         {
             this.id = id;
-            this.cellManager = cellManager;
+            this.boardStuffManager = boardStuffManager;
 
             effect = GetRandomEffect();
             blocked = false;
@@ -111,7 +111,7 @@ namespace BoardStuff
             {
                 if (newState == CellState.BATTLED || newState == CellState.OPENED)
                 {
-                    cellManager.ChangeCellPrefab(id, true);
+                    boardStuffManager.OpenCell(id);
                 }
             }
             else
@@ -122,16 +122,16 @@ namespace BoardStuff
 
         public void Redraw(CellEffect effect)
         {
-            cellManager.RemoveEffect(id);
+            boardStuffManager.RemoveEffect(id);
             
             if (effect.EffectsQuan == 1)
             {
-                cellManager.SetEffect(id, effect.StuffClass, effect.Power);
+                boardStuffManager.SetEffect(id, effect.StuffClass, effect.Power);
             }
             else
             {
-                cellManager.SetEffect(id, effect.StuffClass, effect.Power,
-                    effect.StuffClass2, effect.Power2);
+                //boardStuffManager.SetEffect(id, effect.StuffClass, effect.Power,
+                //    effect.StuffClass2, effect.Power2);
             }
         }
     }

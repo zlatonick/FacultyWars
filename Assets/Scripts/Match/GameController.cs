@@ -3,6 +3,7 @@ using GameEngine;
 using GameStuff;
 using MetaInfo;
 using Preparing;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Match
@@ -12,6 +13,8 @@ namespace Match
         public Board board;
 
         public CardsManager cardsManager;
+
+        public CheckManager checkManager;
 
         private MatchController matchController;
 
@@ -25,9 +28,22 @@ namespace Match
 
         void Start()
         {
+            checkManager.SetCellInThePlacePredicate(board.GetCellByCoords);
+
+            // Setting up the checks
+            Dictionary<int, Check> checkLevels = new Dictionary<int, Check>();
+
+            foreach (Check check in StuffPack.checks)
+            {
+                if (!checkLevels.ContainsKey(check.GetLevel()))
+                {
+                    checkLevels.Add(check.GetLevel(), check);
+                }
+            }
+
             // Setting up the player
             player = new Player(0, StuffPack.stuffClass);
-            playerInfo = new PlayerController(cardsManager);
+            playerInfo = new PlayerController(cardsManager, checkManager, checkLevels);
 
             foreach (Card card in StuffPack.cards)
             {
@@ -46,6 +62,9 @@ namespace Match
             matchController = new MatchControllerImpl(board,
                 player, playerInfo, opponent, engine.GetPlayerInfo());
 
+            playerInfo.SetCheckPlacedAction(matchController.PlaceCheck);
+
+            // Starting the game
             if (matchController.GetCurrMovingPlayer() == player)
             {
                 StartPlayerTurn();

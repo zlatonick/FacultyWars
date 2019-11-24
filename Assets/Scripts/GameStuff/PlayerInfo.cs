@@ -1,4 +1,5 @@
-﻿using MetaInfo;
+﻿using BoardStuff;
+using MetaInfo;
 using System;
 using System.Collections.Generic;
 
@@ -8,7 +9,7 @@ namespace GameStuff
     {
         List<Card> GetCardsInHand();
 
-        List<Check> GetChecksInHand();
+        Dictionary<int, int> GetChecksInHand();
 
         List<Card> GetCardsPlayed();
 
@@ -20,9 +21,7 @@ namespace GameStuff
 
         void AddCardToHand(Card card);
 
-        void RemoveCheckFromHand(Check check);
-
-        void RemoveCardFromHand(Card card);
+        void SetCheckPlacedAction(Action<Check, Cell> checkPlacedAction);
 
         void SetPlayingCardAction(Action<Card> action);
 
