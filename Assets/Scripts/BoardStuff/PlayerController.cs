@@ -104,12 +104,12 @@ namespace BoardStuff
 
         public void SetActionsPermission(bool permission)
         {
-            throw new NotImplementedException();
+            // TODO
         }
 
         public void SetAllowedCardTypes(CardType cardType)
         {
-            throw new NotImplementedException();
+            // TODO
         }
 
         public void SetAllowedCharacters(bool allowed)

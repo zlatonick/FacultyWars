@@ -7,7 +7,7 @@ namespace GameEngine
     {
         public static Engine CreateEngine()
         {
-            throw new NotImplementedException();
+            return new EngineImpl();
         }
 
         public static Engine CreateEngine(StuffClass stuffClass)

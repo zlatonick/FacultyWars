@@ -22,38 +22,31 @@ namespace BoardStuff
             // DEBUG
             SetCanDrag(true);
 
-            //topCheck.SetCanvas(canvas);
+            topCheck.SetCanvas(canvas);
             middleCheck.SetCanvas(canvas);
             bottomCheck.SetCanvas(canvas);
 
-            //topCheck.SetChecksCount(1);
+            topCheck.SetChecksCount(1);
             middleCheck.SetChecksCount(1);
             bottomCheck.SetChecksCount(1);
 
-            //topCheck.gameObject.SetActive(false);
+            topCheck.gameObject.SetActive(false);
             middleCheck.gameObject.SetActive(false);
             bottomCheck.gameObject.SetActive(false);
 
             checksQuan = new Dictionary<CheckDragHandler, int>();
-            //checksQuan.Add(topCheck, 0);
+            checksQuan.Add(topCheck, 0);
             checksQuan.Add(middleCheck, 0);
             checksQuan.Add(bottomCheck, 0);
 
-            //topCheck.SetDragFinishedAction(OnDragFinished);
+            topCheck.SetDragFinishedAction(OnDragFinished);
             middleCheck.SetDragFinishedAction(OnDragFinished);
             bottomCheck.SetDragFinishedAction(OnDragFinished);
-
-            // DEBUG
-            AddCheck(0);
-            AddCheck(0);
-            AddCheck(0);
-            AddCheck(1);
-            AddCheck(1);
         }
 
         public void SetCanDrag(bool canDragNow)
         {
-            //topCheck.SetCanDrag(canDragNow);
+            topCheck.SetCanDrag(canDragNow);
             middleCheck.SetCanDrag(canDragNow);
             bottomCheck.SetCanDrag(canDragNow);
         }
@@ -74,6 +67,8 @@ namespace BoardStuff
 
             if (cell != null)
             {
+                Debug.Log("Spawning a character on cell " + cell.GetId());
+
                 // Removing the check
                 if (checksQuan[check] > 1)
                 {
@@ -88,20 +83,24 @@ namespace BoardStuff
 
                 int checkLevel = 0;
                 if (check == middleCheck) checkLevel = 1;
-                else if (check == topCheck) checkLevel = 2;
+                else if (check == bottomCheck) checkLevel = 2;
 
                 dragFinishedAction(cell, checkLevel);
             }
+            else
+            {
+                Debug.Log("Wrong cell to spawn a character");
+            }
         }
 
-        // Level: 0 - bottom, 1 - middle, 2 - top
+        // Level: 0 - top, 1 - middle, 2 - bottom
         public void AddCheck(int level)
         {
             CheckDragHandler currCheck;
 
-            if (level == 0) currCheck = bottomCheck;
+            if (level == 0) currCheck = topCheck;
             else if (level == 1) currCheck = middleCheck;
-            else currCheck = topCheck;
+            else currCheck = bottomCheck;
 
             if (checksQuan[currCheck] == 0)
             {

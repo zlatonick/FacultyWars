@@ -8,7 +8,9 @@ namespace BoardStuff
     {
         private BoardStuffManager boardStuffManager;
 
-        private Dictionary<Cell, List<Character>> cells;
+        private Dictionary<int, Cell> cells;
+
+        private Dictionary<Cell, List<Character>> cellsCharacters;
 
         private CharacterFactory characterFactory;
 
@@ -20,12 +22,14 @@ namespace BoardStuff
             boardStuffManager.FillBoardWithCells(cellsPairsQuan);
 
             // Creating cell objects
-            cells = new Dictionary<Cell, List<Character>>();
+            cells = new Dictionary<int, Cell>();
+            cellsCharacters = new Dictionary<Cell, List<Character>>();
 
             for (int i = 0; i < 2 * cellsPairsQuan; i++)
             {
                 Cell cell = new CellImpl(i, boardStuffManager);
-                cells.Add(cell, new List<Character>());
+                cells.Add(i, cell);
+                cellsCharacters.Add(cell, new List<Character>());
             }
 
             // Creating character factory
@@ -44,14 +48,14 @@ namespace BoardStuff
 
         public List<Cell> GetAllCells()
         {
-            return new List<Cell>(cells.Keys);
+            return new List<Cell>(cells.Values);
         }
 
         public List<Character> GetAllCharacters()
         {
             List<Character> result = new List<Character>();
 
-            foreach (var pair in cells)
+            foreach (var pair in cellsCharacters)
             {
                 result.AddRange(pair.Value);
             }
@@ -61,7 +65,7 @@ namespace BoardStuff
 
         public Cell GetCharacterCell(Character character)
         {
-            foreach (var pair in cells)
+            foreach (var pair in cellsCharacters)
             {
                 if (pair.Value.Contains(character))
                 {
@@ -74,7 +78,7 @@ namespace BoardStuff
 
         public List<Character> GetCharactersOnCell(Cell cell)
         {
-            return cells[cell];
+            return cellsCharacters[cell];
         }
 
         public void MoveCharacterToCell(Character character, Cell cell)
@@ -85,6 +89,9 @@ namespace BoardStuff
         public void RemoveCell(Cell cell)
         {
             boardStuffManager.RemoveCell(cell.GetId());
+
+            cells.Remove(cell.GetId());
+            cellsCharacters.Remove(cell);
         }
 
         public void ReturnCharacter(Character character)
@@ -109,7 +116,9 @@ namespace BoardStuff
 
         public Cell GetCellByCoords(Vector2 coords)
         {
-            throw new System.NotImplementedException();
+            int cellId = boardStuffManager.GetCellIdByCoords(coords);
+
+            return cellId == -1 ? null : cells[cellId];
         }
     }
 }

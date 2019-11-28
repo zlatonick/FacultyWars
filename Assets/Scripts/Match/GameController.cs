@@ -10,11 +10,13 @@ namespace Match
 {
     public class GameController : MonoBehaviour
     {
-        public Board board;
-
         public CardsManager cardsManager;
 
         public CheckManager checkManager;
+
+        public BoardStuffManager boardStuffManager;
+
+        private Board board;
 
         private MatchController matchController;
 
@@ -28,6 +30,26 @@ namespace Match
 
         void Start()
         {
+            // DEBUG. Change to a real StuffPack
+            StuffPack.stuffClass = StuffClass.FICT;            
+            StuffPack.cards = new List<Card>();
+            StuffPack.checks = new List<Check>();
+
+            // DEBUG
+            CheckFactory checkFactory = new CheckFactoryImpl();
+
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 0));
+
+            board = new BoardController(boardStuffManager, 4);
+
             checkManager.SetCellInThePlacePredicate(board.GetCellByCoords);
 
             // Setting up the checks
@@ -60,9 +82,9 @@ namespace Match
 
             // Setting up the match controller
             matchController = new MatchControllerImpl(board,
-                player, playerInfo, opponent, engine.GetPlayerInfo());
+                player, playerInfo, opponent, /*engine.GetPlayerInfo()*/ null);
 
-            playerInfo.SetCheckPlacedAction(matchController.PlaceCheck);
+            playerInfo.SetCheckPlacedAction(CheckPlaced);
 
             // Starting the game
             if (matchController.GetCurrMovingPlayer() == player)

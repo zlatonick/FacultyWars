@@ -47,8 +47,11 @@ namespace Match
             playersInfo.Add(player1, playerInfo1);
             playersInfo.Add(player2, playerInfo2);
 
-            // Choosing the first player
-            System.Random random = new System.Random();
+            // Choosing the first player    DEBUG
+            currPlayer = player1;
+            currOpponent = player2;
+            /*
+            Random random = new Random();
 
             if (random.Next(0, 2) == 0)
             {
@@ -59,7 +62,7 @@ namespace Match
             {
                 currPlayer = player2;
                 currOpponent = player1;
-            }
+            }*/
 
             changePlayersAfterMoveFinished = true;
 

@@ -4,6 +4,6 @@ namespace GameStuff
 {
     public interface CheckFactory
     {
-        Check GetCheck(StuffClass stuffClass, int power);
+        Check GetCheck(StuffClass stuffClass, int level);
     }
 }

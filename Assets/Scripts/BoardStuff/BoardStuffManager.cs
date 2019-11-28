@@ -73,6 +73,9 @@ namespace BoardStuff
             }
         }
 
+        private float boardWidth;
+        private float boardHeight;
+
         // ---------------- Cells
 
         public GameObject cellClosedPrefab;
@@ -136,6 +139,10 @@ namespace BoardStuff
 
         void Start()
         {
+            RectTransform thisRect = gameObject.GetComponent<RectTransform>();
+            boardWidth = thisRect.sizeDelta.x * thisRect.localScale.x;
+            boardHeight = thisRect.sizeDelta.y * thisRect.localScale.y;
+
             // Cells
             var cellPrefabRect = cellClosedPrefab.GetComponent<RectTransform>();
             cellWidth = cellPrefabRect.sizeDelta.x * cellPrefabRect.localScale.x;
@@ -161,15 +168,10 @@ namespace BoardStuff
 
             var digitPrefabRect = powerDigits[0].GetComponent<RectTransform>();
             digitsDistance = digitPrefabRect.sizeDelta.x * digitPrefabRect.localScale.x;
-
-            // DEBUG
-            FillBoardWithCells(4);
         }
 
         public void FillBoardWithCells(int pairCellsQuan)
         {
-            Debug.Log("Start filling");
-
             for (int i = 0; i < pairCellsQuan; i++)
             {
                 // Bottom cell
@@ -293,6 +295,34 @@ namespace BoardStuff
             RemoveEffect(cellId);
             Destroy(cells[cellId]);
             cells.Remove(cellId);
+        }
+
+        private bool PointIsInCell(Vector2 vecX, Vector2 vecY, Vector2 point)
+        {
+            float det = vecX.x * vecY.y - vecX.y * vecY.x;
+            float coordX = (vecY.y * point.x - vecY.x * point.y) / det;
+            float coordY = (vecX.y * point.x + vecX.x * point.y) / det;
+
+            return coordX >= 0 && coordX <= 1 && coordY >= 0 && coordY <= 1;
+        }
+
+        public int GetCellIdByCoords(Vector2 coords)
+        {
+            Vector2 vecX = new Vector2(cellWidthClear, 0);
+            Vector2 vecY = new Vector2(cellOffset, cellHeight);
+
+            foreach (var pr in cells)
+            {
+                Vector2 pointVec = new Vector2(
+                    coords.x - pr.Value.transform.localPosition.x + (cellWidth / 2),
+                    coords.y - pr.Value.transform.localPosition.y + (cellHeight / 2));
+
+                if (PointIsInCell(vecX, vecY, pointVec))
+                {
+                    return pr.Key;
+                }
+            }
+            return -1;
         }
 
         private CharacterInfo FindCharacter(int characterId)
