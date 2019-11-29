@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using MetaInfo;
+using UnityEngine.UI;
 
 namespace BoardStuff
 {
@@ -12,45 +13,24 @@ namespace BoardStuff
             public int effectsQuan;
 
             public GameObject icon;
-
-            public GameObject sign;
-            public GameObject firstDigit;
-            public GameObject secondDigit;
-
             public GameObject icon_2;
-
-            public GameObject sign_2;
-            public GameObject firstDigit_2;
-            public GameObject secondDigit_2;
 
             public CellEffect()
             {
                 effectsQuan = 0;
             }
 
-            public CellEffect(GameObject icon, GameObject sign,
-                GameObject firstDigit, GameObject secondDigit)
+            public CellEffect(GameObject icon)
             {
                 effectsQuan = 1;
                 this.icon = icon;
-                this.sign = sign;
-                this.firstDigit = firstDigit;
-                this.secondDigit = secondDigit;
             }
 
-            public CellEffect(GameObject icon, GameObject sign, GameObject firstDigit,
-                GameObject secondDigit, GameObject icon_2, GameObject sign_2, GameObject firstDigit_2,
-                GameObject secondDigit_2)
+            public CellEffect(GameObject icon, GameObject icon_2)
             {
                 effectsQuan = 2;
                 this.icon = icon;
-                this.sign = sign;
-                this.firstDigit = firstDigit;
-                this.secondDigit = secondDigit;
                 this.icon_2 = icon_2;
-                this.sign_2 = sign_2;
-                this.firstDigit_2 = firstDigit_2;
-                this.secondDigit_2 = secondDigit_2;
             }
         }
 
@@ -62,19 +42,13 @@ namespace BoardStuff
 
             public GameObject charPrefab;
 
-            public List<GameObject> digits;
-
-            public CharacterInfo(int id, bool isBottom, GameObject charPrefab, List<GameObject> digits)
+            public CharacterInfo(int id, bool isBottom, GameObject charPrefab)
             {
                 this.id = id;
                 this.isBottom = isBottom;
                 this.charPrefab = charPrefab;
-                this.digits = digits;
             }
         }
-
-        private float boardWidth;
-        private float boardHeight;
 
         // ---------------- Cells
 
@@ -88,17 +62,6 @@ namespace BoardStuff
         public GameObject fictIcon;
 
         public GameObject fpmIcon;
-
-        // Additional effect icons
-        public GameObject plusIcon;
-
-        public GameObject minusIcon;
-
-        public GameObject zeroIcon;
-
-        public GameObject oneIcon;
-
-        public GameObject twoIcon;
 
         // Created cells
         private Dictionary<int, GameObject> cells;
@@ -123,11 +86,6 @@ namespace BoardStuff
 
         private float characterOffset;
 
-        private float digitsDistance;   // Distance between the centers of two digits
-
-        // Digits game objects
-        public GameObject[] powerDigits;
-
         // Character game objects (holded in structure)
         private Dictionary<StuffClass, GameObject> charGameObjects;
 
@@ -139,10 +97,6 @@ namespace BoardStuff
 
         void Start()
         {
-            RectTransform thisRect = gameObject.GetComponent<RectTransform>();
-            boardWidth = thisRect.sizeDelta.x * thisRect.localScale.x;
-            boardHeight = thisRect.sizeDelta.y * thisRect.localScale.y;
-
             // Cells
             var cellPrefabRect = cellClosedPrefab.GetComponent<RectTransform>();
             cellWidth = cellPrefabRect.sizeDelta.x * cellPrefabRect.localScale.x;
@@ -165,9 +119,6 @@ namespace BoardStuff
             charsCells = new Dictionary<int, int>();
 
             characterOffset = 10;
-
-            var digitPrefabRect = powerDigits[0].GetComponent<RectTransform>();
-            digitsDistance = digitPrefabRect.sizeDelta.x * digitPrefabRect.localScale.x;
         }
 
         public void FillBoardWithCells(int pairCellsQuan)
@@ -208,27 +159,6 @@ namespace BoardStuff
             return null;
         }
 
-        private GameObject GetIconOfSign(bool sign)
-        {
-            return sign ? plusIcon : minusIcon;
-        }
-
-        private GameObject GetIconOfDigit(int digit)
-        {
-            switch (digit)
-            {
-                case 0:
-                    return zeroIcon;
-
-                case 1:
-                    return oneIcon;
-
-                case 2:
-                    return twoIcon;
-            }
-            return null;
-        }
-
         public void OpenCell(int cellId)
         {
             GameObject newCell = Instantiate(cellOpenedPrefab, transform, false);
@@ -241,50 +171,70 @@ namespace BoardStuff
 
         public void SetEffect(int cellId, StuffClass stuffClass, int power)
         {
-            // Instantiating all the elements
             GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
                 transform, false);
-            GameObject signIcon = Instantiate(GetIconOfSign(power > 0), transform, false);
-            GameObject firstDigitIcon = Instantiate(GetIconOfDigit(Mathf.Abs(power) / 10),
-                transform, false);
-            GameObject secondDigitIcon = Instantiate(zeroIcon, transform, false);
 
-            // Setting the positions
-            Vector2 cellPos = cells[cellId].transform.localPosition;
+            GameObject cell = cells[cellId];
+            Vector2 cellPos = cell.transform.localPosition;
 
             stuffClassIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.272f * cellWidth, cellPos.y);
-            signIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.0388f * cellWidth, cellPos.y);
-            firstDigitIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.1747f * cellWidth, cellPos.y);
-            secondDigitIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.2913f * cellWidth, cellPos.y);
+                cellPos.x - 0.177f * cellWidth, cellPos.y);
 
-            cellEffects.Add(cellId, new CellEffect(stuffClassIcon,
-                signIcon, firstDigitIcon, secondDigitIcon));
+            Text middleText = cell.transform.Find("text_middle").gameObject.GetComponent<Text>();
+            middleText.text = "" + (power > 0 ? "+" : "") + power;
+
+            cellEffects.Add(cellId, new CellEffect(stuffClassIcon));
+        }
+
+        public void SetEffect(int cellId, StuffClass stuffClass, int power,
+            StuffClass stuffClass2, int power2)
+        {
+            GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
+                transform, false);
+            GameObject stuffClassIcon2 = Instantiate(GetIconOfStuffClass(stuffClass2),
+                transform, false);
+
+            GameObject cell = cells[cellId];
+            Vector2 cellPos = cell.transform.localPosition;
+
+            stuffClassIcon.transform.localPosition = new Vector2(
+                cellPos.x - 0.13f * cellWidth, cellPos.y + cellHeight / 4);
+            stuffClassIcon2.transform.localPosition = new Vector2(
+                cellPos.x - 0.224f * cellWidth, cellPos.y - cellHeight / 4);
+
+            Text topText = cell.transform.Find("text_top").gameObject.GetComponent<Text>();
+            Text bottomText = cell.transform.Find("text_bottom").gameObject.GetComponent<Text>();
+
+            topText.text = "" + (power > 0 ? "+" : "") + power;
+            bottomText.text = "" + (power2 > 0 ? "+" : "") + power2;
+
+            cellEffects.Add(cellId, new CellEffect(stuffClassIcon, stuffClassIcon2));
         }
 
         public void RemoveEffect(int cellId)
         {
             if (!cellEffects.ContainsKey(cellId)) return;
 
+            GameObject cell = cells[cellId];
             CellEffect effect = cellEffects[cellId];
 
-            if (effect.effectsQuan > 0)
+            if (effect.effectsQuan == 1)
             {
                 Destroy(effect.icon);
-                Destroy(effect.sign);
-                Destroy(effect.firstDigit);
-                Destroy(effect.secondDigit);
 
-                if (effect.effectsQuan > 1)
-                {
-                    Destroy(effect.icon_2);
-                    Destroy(effect.sign_2);
-                    Destroy(effect.firstDigit_2);
-                    Destroy(effect.secondDigit_2);
-                }
+                Text middleText = cell.transform.Find("text_middle").gameObject.GetComponent<Text>();
+                middleText.text = "";
+            }
+            else if (effect.effectsQuan == 2)
+            {
+                Destroy(effect.icon);
+                Destroy(effect.icon_2);
+
+                Text topText = cell.transform.Find("text_top").gameObject.GetComponent<Text>();
+                Text bottomText = cell.transform.Find("text_bottom").gameObject.GetComponent<Text>();
+
+                topText.text = "";
+                bottomText.text = "";
             }
 
             cellEffects.Remove(cellId);
@@ -361,40 +311,6 @@ namespace BoardStuff
             return charCoords;
         }
 
-        private List<Vector2> GetCharDigitsCoords(Vector2 charCoords, int digitsQuan)
-        {
-            List<Vector2> result = new List<Vector2>();
-
-            if (digitsQuan == 1)
-            {
-                result.Add(new Vector2(charCoords.x + (characterOffset / 2), charCoords.y));
-            }
-            else if (digitsQuan == 2)
-            {
-                result.Add(new Vector3(
-                    charCoords.x + (characterOffset / 2) + digitsDistance / 2,
-                    charCoords.y, -8));
-                result.Add(new Vector3(
-                    charCoords.x + (characterOffset / 2) - digitsDistance / 2,
-                    charCoords.y, -8));
-            }
-            else if (digitsQuan == 3)
-            {
-                result.Add(new Vector3(
-                    charCoords.x + (characterOffset / 2) + digitsDistance,
-                    charCoords.y, -8));
-                result.Add(new Vector3(
-                    charCoords.x + (characterOffset / 2),
-                    charCoords.y, -8));
-                result.Add(new Vector3(
-                    charCoords.x + (characterOffset / 2) - digitsDistance,
-                    charCoords.y, -8));
-            }
-
-            return result;
-
-        }
-
         // TODO: Add more than 2 characters on cell support
         public void SpawnCharacter(int cellId, int characterId, StuffClass stuffClass,
             int power, bool toBottom)
@@ -407,22 +323,11 @@ namespace BoardStuff
                 charGameObjects[stuffClass], transform, false);
             charPrefab.transform.localPosition = charCoords;
 
-            // Getting the digits
-            List<GameObject> charDigits = new List<GameObject>();
+            // Setting the power
+            Text powerText = charPrefab.GetComponentInChildren<Text>();
+            powerText.text = "" + power;
 
-            int digitsQuan = (int)Mathf.Log10(power) + 1;
-            int currPower = power;
-
-            foreach (Vector2 coords in GetCharDigitsCoords(charCoords, digitsQuan))
-            {
-                GameObject digit = Instantiate(powerDigits[currPower % 10], transform, false);
-                digit.transform.localPosition = coords;
-                charDigits.Add(digit);
-
-                currPower /= 10;
-            }
-
-            CharacterInfo charInfo = new CharacterInfo(characterId, toBottom, charPrefab, charDigits);
+            CharacterInfo charInfo = new CharacterInfo(characterId, toBottom, charPrefab);
 
             // Adding character to the board info
             if (!characters.ContainsKey(cellId))
@@ -441,10 +346,6 @@ namespace BoardStuff
             CharacterInfo character = FindCharacter(characterId);
 
             // Destroying the character
-            foreach (GameObject obj in character.digits)
-            {
-                Destroy(obj);
-            }
             Destroy(character.charPrefab);
 
             // Removing character from structure
@@ -454,28 +355,8 @@ namespace BoardStuff
         public void ChangeCharacterPower(int characterId, int newPower)
         {
             CharacterInfo character = FindCharacter(characterId);
-
-            // Destroying old digits
-            foreach (GameObject obj in character.digits)
-            {
-                Destroy(obj);
-            }
-
-            character.digits.Clear();
-
-            // Drawing new digits
-            int digitsQuan = (int)Mathf.Log10(newPower) + 1;
-            int currPower = newPower;
-
-            foreach (Vector2 coords in GetCharDigitsCoords(
-                character.charPrefab.transform.localPosition, digitsQuan))
-            {
-                GameObject digit = Instantiate(powerDigits[currPower % 10], transform, false);
-                digit.transform.localPosition = coords;
-                character.digits.Add(digit);
-
-                currPower /= 10;
-            }
+            Text powerText = character.charPrefab.GetComponentInChildren<Text>();
+            powerText.text = "" + newPower;
         }
     }
 }

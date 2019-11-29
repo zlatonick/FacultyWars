@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetaInfo;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,49 +7,75 @@ namespace BoardStuff
 {
     public class CheckManager : MonoBehaviour
     {
-        public CheckDragHandler topCheck;
-        public CheckDragHandler middleCheck;
-        public CheckDragHandler bottomCheck;
+        // Levels are indexes. Levels: 0 - top, 1 - middle, 2 - bottom
+        public CheckDragHandler[] redChecks;
+        public CheckDragHandler[] blueChecks;
+        public CheckDragHandler[] greenChecks;
 
         public Canvas canvas;
 
-        private Dictionary<CheckDragHandler, int> checksQuan;
+        private CheckDragHandler[] currChecks;
+
+        private Dictionary<int, int> checksQuan;        // level -> quantity
 
         private Func<Vector2, Cell> cellInThePlace;
         private Action<Cell, int> dragFinishedAction;
 
         void Start()
         {
-            // DEBUG
-            SetCanDrag(true);
+            for (int i = 0; i < redChecks.Length; i++)
+            {
+                redChecks[i].SetLevel(i);
+                redChecks[i].SetCanvas(canvas);
+                redChecks[i].SetChecksCount(1);
+                redChecks[i].gameObject.SetActive(false);
+                redChecks[i].SetDragFinishedAction(OnDragFinished);
+            }
 
-            topCheck.SetCanvas(canvas);
-            middleCheck.SetCanvas(canvas);
-            bottomCheck.SetCanvas(canvas);
+            for (int i = 0; i < blueChecks.Length; i++)
+            {
+                blueChecks[i].SetLevel(i);
+                blueChecks[i].SetCanvas(canvas);
+                blueChecks[i].SetChecksCount(1);
+                blueChecks[i].gameObject.SetActive(false);
+                blueChecks[i].SetDragFinishedAction(OnDragFinished);
+            }
 
-            topCheck.SetChecksCount(1);
-            middleCheck.SetChecksCount(1);
-            bottomCheck.SetChecksCount(1);
+            for (int i = 0; i < greenChecks.Length; i++)
+            {
+                greenChecks[i].SetLevel(i);
+                greenChecks[i].SetCanvas(canvas);
+                greenChecks[i].SetChecksCount(1);
+                greenChecks[i].gameObject.SetActive(false);
+                greenChecks[i].SetDragFinishedAction(OnDragFinished);
+            }
 
-            topCheck.gameObject.SetActive(false);
-            middleCheck.gameObject.SetActive(false);
-            bottomCheck.gameObject.SetActive(false);
+            checksQuan = new Dictionary<int, int>();
+            checksQuan.Add(0, 0);
+            checksQuan.Add(1, 0);
+            checksQuan.Add(2, 0);
 
-            checksQuan = new Dictionary<CheckDragHandler, int>();
-            checksQuan.Add(topCheck, 0);
-            checksQuan.Add(middleCheck, 0);
-            checksQuan.Add(bottomCheck, 0);
+            currChecks = null;
+        }
 
-            topCheck.SetDragFinishedAction(OnDragFinished);
-            middleCheck.SetDragFinishedAction(OnDragFinished);
-            bottomCheck.SetDragFinishedAction(OnDragFinished);
+        public void SetStuffClass(StuffClass stuffClass, Dictionary<int, int> powers)
+        {
+            if (stuffClass == StuffClass.IASA) currChecks = redChecks;
+            else if (stuffClass == StuffClass.FICT) currChecks = blueChecks;
+            else if (stuffClass == StuffClass.FPM) currChecks = greenChecks;
+
+            foreach (var pr in powers)
+            {
+                currChecks[pr.Key].SetPower(pr.Value);
+            }
         }
 
         public void SetCanDrag(bool canDragNow)
         {
-            topCheck.SetCanDrag(canDragNow);
-            middleCheck.SetCanDrag(canDragNow);
-            bottomCheck.SetCanDrag(canDragNow);
+            foreach (CheckDragHandler check in currChecks)
+            {
+                check.SetCanDrag(canDragNow);
+            }
         }
 
         public void SetCellInThePlacePredicate(Func<Vector2, Cell> cellInThePlace)
@@ -65,25 +92,23 @@ namespace BoardStuff
         {
             Cell cell = cellInThePlace(pos);
 
+            int checkLevel = check.GetLevel();
+
             if (cell != null)
             {
                 Debug.Log("Spawning a character on cell " + cell.GetId());
 
                 // Removing the check
-                if (checksQuan[check] > 1)
+                if (checksQuan[checkLevel] > 1)
                 {
-                    checksQuan[check]--;
-                    check.SetChecksCount(checksQuan[check]);
+                    checksQuan[checkLevel]--;
+                    check.SetChecksCount(checksQuan[checkLevel]);
                 }
                 else
                 {
-                    checksQuan[check]--;
+                    checksQuan[checkLevel]--;
                     check.gameObject.SetActive(false);
                 }
-
-                int checkLevel = 0;
-                if (check == middleCheck) checkLevel = 1;
-                else if (check == bottomCheck) checkLevel = 2;
 
                 dragFinishedAction(cell, checkLevel);
             }
@@ -96,22 +121,18 @@ namespace BoardStuff
         // Level: 0 - top, 1 - middle, 2 - bottom
         public void AddCheck(int level)
         {
-            CheckDragHandler currCheck;
+            CheckDragHandler currCheck = currChecks[level];
 
-            if (level == 0) currCheck = topCheck;
-            else if (level == 1) currCheck = middleCheck;
-            else currCheck = bottomCheck;
-
-            if (checksQuan[currCheck] == 0)
+            if (checksQuan[level] == 0)
             {
-                checksQuan[currCheck]++;
+                checksQuan[level]++;
                 currCheck.gameObject.SetActive(true);
                 currCheck.SetChecksCount(1);
             }
             else
             {
-                checksQuan[currCheck]++;
-                currCheck.SetChecksCount(checksQuan[currCheck]);
+                checksQuan[level]++;
+                currCheck.SetChecksCount(checksQuan[level]);
             }
         }
     }

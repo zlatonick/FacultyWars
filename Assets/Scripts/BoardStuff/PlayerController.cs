@@ -8,6 +8,8 @@ namespace BoardStuff
 {
     public class PlayerController : PlayerInfo
     {
+        StuffClass stuffClass;
+
         Dictionary<int, Card> cards;
 
         Dictionary<int, Check> checkLevels;      // int is check level
@@ -26,9 +28,10 @@ namespace BoardStuff
 
         CheckManager checkManager;
 
-        public PlayerController(CardsManager cardsManager, CheckManager checkManager,
-            Dictionary<int, Check> checkLevels)
+        public PlayerController(StuffClass stuffClass, CardsManager cardsManager,
+            CheckManager checkManager, Dictionary<int, Check> checkLevels)
         {
+            this.stuffClass = stuffClass;
             this.cardsManager = cardsManager;
             this.checkManager = checkManager;
             this.checkLevels = checkLevels;
@@ -41,10 +44,18 @@ namespace BoardStuff
             battlesHistory = new List<int>();
 
             checks = new Dictionary<int, int>();
+            Dictionary<int, int> checkPowers = new Dictionary<int, int>();
+
             foreach (var pr in checkLevels)
             {
                 checks.Add(pr.Key, 0);
+                checkPowers.Add(pr.Key, pr.Value.GetPower());
             }
+
+            checkManager.SetStuffClass(stuffClass, checkPowers);
+
+            // DEBUG
+            checkManager.SetCanDrag(true);
         }
 
         public void SetCheckPlacedAction(Action<Check, Cell> checkPlacedAction)

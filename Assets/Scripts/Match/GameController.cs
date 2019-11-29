@@ -31,22 +31,22 @@ namespace Match
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            StuffPack.stuffClass = StuffClass.FICT;            
+            StuffPack.stuffClass = StuffClass.FPM;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 0));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FICT, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 0));
 
             board = new BoardController(boardStuffManager, 4);
 
@@ -65,7 +65,8 @@ namespace Match
 
             // Setting up the player
             player = new Player(0, StuffPack.stuffClass);
-            playerInfo = new PlayerController(cardsManager, checkManager, checkLevels);
+            playerInfo = new PlayerController(StuffPack.stuffClass,
+                cardsManager, checkManager, checkLevels);
 
             foreach (Card card in StuffPack.cards)
             {

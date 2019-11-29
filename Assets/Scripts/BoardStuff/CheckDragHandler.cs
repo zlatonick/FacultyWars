@@ -15,13 +15,27 @@ namespace BoardStuff
         public GameObject checksCount;
         private Text checksCountText;
 
+        public Text powerText;
+
         private bool canDrag;
+
+        private int level;
 
         private Action<CheckDragHandler, Vector2> dragFinishedAction;
 
         void Start()
         {
             checksCountText = checksCount.GetComponentInChildren<Text>();
+        }
+
+        public void SetLevel(int level)
+        {
+            this.level = level;
+        }
+
+        public int GetLevel()
+        {
+            return level;
         }
 
         public void SetCanvas(Canvas canvas)
@@ -32,6 +46,11 @@ namespace BoardStuff
         public void SetCanDrag(bool canDrag)
         {
             this.canDrag = canDrag;
+        }
+
+        public void SetPower(int power)
+        {
+            powerText.text = "" + power;
         }
 
         public void SetChecksCount(int count)
@@ -59,6 +78,8 @@ namespace BoardStuff
                 checkPrefab = Instantiate(gameObject, transform.parent.parent, false);
                 checkPrefab.transform.localPosition =
                     canvas.ScreenToCanvasPosition(eventData.position);
+
+                checkPrefab.transform.Find("ChecksCount").gameObject.SetActive(false);
             }
         }
 
