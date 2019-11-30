@@ -8,6 +8,8 @@ namespace BoardStuff
     {
         int GetId();
 
+        int GetLevel();
+
         int GetPower();
 
         int GetStartPower();

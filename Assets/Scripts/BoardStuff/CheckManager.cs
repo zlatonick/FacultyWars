@@ -96,8 +96,6 @@ namespace BoardStuff
 
             if (cell != null)
             {
-                Debug.Log("Spawning a character on cell " + cell.GetId());
-
                 // Removing the check
                 if (checksQuan[checkLevel] > 1)
                 {

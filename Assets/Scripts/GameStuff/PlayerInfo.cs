@@ -23,11 +23,13 @@ namespace GameStuff
 
         void SetCheckPlacedAction(Action<Check, Cell> checkPlacedAction);
 
-        void SetPlayingCardAction(Action<Card> action);
+        void SetCardPlayedAction(Action<Card> cardPlayedAction);
+
+        void SetCanPlayCardPredicate(Func<CardType> canPlayCardNow);
+
+        void SetActionAfterCardIsPlayed(Action<Card> action);
 
         void SetActionsPermission(bool permission);
-
-        void SetAllowedCardTypes(CardType cardType);
 
         void SetAllowedCharacters(bool allowed);
     }

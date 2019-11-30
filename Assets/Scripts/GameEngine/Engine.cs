@@ -1,6 +1,5 @@
 ﻿using GameStuff;
 using MetaInfo;
-using System.Collections.Generic;
 
 namespace GameEngine
 {
@@ -10,7 +9,7 @@ namespace GameEngine
 
         PlayerInfo GetPlayerInfo();
 
-        PlayerMove MakeMove();
+        PlayerMove MakeMove(MatchController controller);
 
         Card MakeBattleMove();
     }

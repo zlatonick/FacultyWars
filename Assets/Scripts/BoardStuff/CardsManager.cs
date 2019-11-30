@@ -1,4 +1,5 @@
 ﻿using MetaInfo;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,34 +8,57 @@ namespace BoardStuff
 {
     public class CardsManager : MonoBehaviour
     {
-        public GameObject cardPrefab;
+        public Canvas canvas;
 
-        private List<GameObject> cardInstances;
+        // 0 - gold, 1 - silver, 2 - neutral
+        public CardClickHandler[] iasaCards;
+        public CardClickHandler[] fictCards;
+        public CardClickHandler[] fpmCards;
+
+        private Dictionary<int, GameObject> cardInstances;
 
         // Some metrical characteristics
-        private int cardsQuan;
+        private int lastCardId;
 
         private float cardWidth;
         private float cardPanelWidth;
+        private float cardPanelHeight;
         private float cardsDistance;
 
-        // Start is called before the first frame update
+        // Card played action
+        private Action<int> cardPlayedAction;
+        private Func<int, bool> canPlayCard;
+
         void Start()
         {
-            cardInstances = new List<GameObject>();
-            cardsQuan = 0;
+            cardInstances = new Dictionary<int, GameObject>();
+            lastCardId = 0;
 
-            var cardPrefabRect = cardPrefab.GetComponent<RectTransform>();
+            // Calculating some metrics
+            var cardPrefabRect = iasaCards[0].GetComponent<RectTransform>();
             cardWidth = cardPrefabRect.sizeDelta.x * cardPrefabRect.localScale.x;
 
             RectTransform cardPanelRect = GetComponent<RectTransform>();
             cardPanelWidth = cardPanelRect.rect.xMax - cardPanelRect.rect.xMin;
+            cardPanelWidth = cardPanelRect.rect.yMax - cardPanelRect.rect.yMin;
 
             cardsDistance = cardPanelWidth / 20;
         }
 
+        public void SetCardPlayedAction(Action<int> cardPlayedAction)
+        {
+            this.cardPlayedAction = cardPlayedAction;
+        }
+
+        public void SetCanPlayCardPredicate(Func<int, bool> canPlayCard)
+        {
+            this.canPlayCard = canPlayCard;
+        }
+
         private void FixCardsPositions()
         {
+            int cardsQuan = cardInstances.Count;
+
             if (cardsQuan * (cardWidth + cardsDistance) > cardPanelWidth)
             {
                 cardsDistance = cardPanelWidth / cardsQuan - cardWidth;
@@ -47,24 +71,38 @@ namespace BoardStuff
             for (int i = 0; i < cardsQuan; i++)
             {
                 cardInstances[i].transform.localPosition = new Vector2(
-                    i * (cardWidth + cardsDistance),
-                    cardInstances[i].transform.localPosition.y);
+                    i * (cardWidth + cardsDistance), 0);
             }
         }
 
         public int AddCard(StuffClass stuffClass, CardType cardType, string text)
         {
             // Creating the card
-            GameObject newInst = Instantiate(cardPrefab, transform, false);
+            CardClickHandler cardSource = null;
 
-            var cardText = cardPrefab.GetComponentInChildren<Text>();
+            if (stuffClass == StuffClass.IASA) cardSource = iasaCards[(int)cardType];
+            else if (stuffClass == StuffClass.FICT) cardSource = fictCards[(int)cardType];
+            else if (stuffClass == StuffClass.FPM) cardSource = fpmCards[(int)cardType];
+
+            GameObject newInst = Instantiate(cardSource.gameObject, transform, false);
+
+            // Setting the parameters
+            CardClickHandler card = newInst.GetComponent<CardClickHandler>();
+            card.SetId(lastCardId);
+            card.SetCardPlayedAction(cardPlayedAction);
+            card.SetCanvas(canvas);
+            card.SetCanDragPredicate(canPlayCard);
+
+            var cardText = newInst.GetComponentInChildren<Text>();
             cardText.text = text;
 
             // Adding to the list
-            cardInstances.Add(newInst);
-            cardsQuan++;
+            cardInstances.Add(lastCardId, newInst);
+            lastCardId++;
 
             // Fixing the positions
+            int cardsQuan = cardInstances.Count;
+
             if (cardsQuan * (cardWidth + cardsDistance) > cardPanelWidth)
             {
                 FixCardsPositions();
@@ -72,19 +110,17 @@ namespace BoardStuff
             else
             {
                 newInst.transform.localPosition = new Vector2(
-                    (cardsQuan - 1) * (cardWidth + cardsDistance),
-                    newInst.transform.localPosition.y);
+                    (cardsQuan - 1) * (cardWidth + cardsDistance), 0);
             }
 
-            return cardsQuan - 1;
+            return lastCardId - 1;
         }
 
-        public void RemoveCard(int index)
+        public void RemoveCard(int cardId)
         {
-            GameObject card = cardInstances[index];
+            GameObject card = cardInstances[cardId];
 
-            cardInstances.RemoveAt(index);
-            cardsQuan++;
+            cardInstances.Remove(cardId);
 
             Destroy(card);
 

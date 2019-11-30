@@ -10,11 +10,9 @@ namespace BoardStuff
 
         List<Cell> GetAllCells();
 
-        Character SpawnCharacter(StuffClass stuffClass, int power, Player player, Cell cell);
+        Character SpawnCharacter(StuffClass stuffClass, int level, int power, Player player, Cell cell);
 
         void DestroyCharacter(Character character);
-
-        void ReturnCharacter(Character character);
 
         void StartBattle(Cell cell);
 
@@ -28,6 +26,14 @@ namespace BoardStuff
 
         void RemoveCell(Cell cell);
 
+        void OpenCell(Cell cell);
+
+        Cell GetCellById(int id);
+
         Cell GetCellByCoords(Vector2 coords);
+
+        void SetCellEffect(Cell cell, CellEffect cellEffect);
+
+        void RemoveCellEffect(Cell cell);
     }
 }

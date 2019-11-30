@@ -3,6 +3,7 @@ using GameStuff;
 using MetaInfo;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Match
 {   
@@ -25,6 +26,9 @@ namespace Match
         // Battle info
 
         bool isBattleNow;
+
+        int turnsWithoutPlayingCards;       // 2 turns - finishing the battle
+        bool cardPlayedThisTurn;
 
         Dictionary<Player, List<Battle>> battles;
 
@@ -81,6 +85,8 @@ namespace Match
             battleCharacters.Add(player2, new List<Character>());
 
             isBattleNow = false;
+            turnsWithoutPlayingCards = 0;
+            cardPlayedThisTurn = false;
 
             battleStatuses = new Dictionary<Player, BattleStatus>();
 
@@ -88,8 +94,80 @@ namespace Match
             battleStatuses.Add(player2, BattleStatus.NO_BATTLE);
         }
 
+        private static int GetRandomEffectPower(System.Random random)
+        {
+            if (random.Next(2) == 0)
+            {
+                return random.Next(1, 3) * 10;
+            }
+            else
+            {
+                return -random.Next(1, 3) * 10;
+            }
+        }
+
+        private static CellEffect GetRandomCellEffect()
+        {
+            /*
+             * Generating a random cell effect
+             * 50% - cell has two effects
+             * 40% - cell has one effect
+             * 10% - cell has no effects
+             * Every effect and its value is chosen randomly with equal probabilities
+             */
+
+            System.Random random = new System.Random();
+
+            int effectsQuan = random.Next(10);
+
+            if (effectsQuan < 5)
+            {
+                int stuffInt = random.Next(3);
+
+                int[] numbers = new int[2];
+                int index = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (i != stuffInt)
+                    {
+                        numbers[index] = i;
+                        index++;
+                    }
+                }
+
+                int stuffInt2 = numbers[random.Next(2)];
+
+                return new CellEffect((StuffClass)stuffInt, GetRandomEffectPower(random),
+                    (StuffClass)stuffInt2, GetRandomEffectPower(random));
+            }
+            else if (effectsQuan < 9)
+            {
+                return new CellEffect((StuffClass)random.Next(3), GetRandomEffectPower(random));
+            }
+            else
+            {
+                return new CellEffect();
+            }
+        }
+
         private void ChangeMove()
         {
+            if (isBattleNow && !cardPlayedThisTurn)
+            {
+                turnsWithoutPlayingCards++;
+
+                if (turnsWithoutPlayingCards >= 2)
+                {
+                    turnsWithoutPlayingCards = 0;
+                    FinishBattle(DetermineCurrBattleWinner());
+                }
+            }
+            else
+            {
+                turnsWithoutPlayingCards = 0;
+            }
+            cardPlayedThisTurn = false;
+
             if (changePlayersAfterMoveFinished)
             {
                 Player temp = currPlayer;
@@ -121,8 +199,8 @@ namespace Match
         public void PlaceCheck(Check check, Cell cell)
         {
             // Spawning the character
-            Character newCharacter = board.SpawnCharacter(
-                check.GetStuffClass(), check.GetPower(), currPlayer, cell);
+            Character newCharacter = board.SpawnCharacter(check.GetStuffClass(),
+                check.GetLevel(), check.GetPower(), currPlayer, cell);
 
             if (cell.GetState() == CellState.OPENED ||
                 cell.GetState() == CellState.BATTLED)
@@ -157,7 +235,7 @@ namespace Match
             if (enemies.Count > 0)
             {
                 // Checking if battle is already going
-                if (characters.Count > enemies.Count)
+                if (characters.Count - 1 > enemies.Count && isBattleNow)
                 {
                     // Adding character to the battle
                     battleCharacters[charPlayer].Add(newCharacter);
@@ -190,6 +268,7 @@ namespace Match
 
                     // Starting the battle
                     isBattleNow = true;
+                    turnsWithoutPlayingCards = -1;      // First move is not considered
 
                     battleStatuses[charPlayer] = BattleStatus.NO_CARDS_PLAYED;
                     battleStatuses[charOpponent] = BattleStatus.NO_CARDS_PLAYED;
@@ -224,7 +303,8 @@ namespace Match
             // Redrawing the cell
             CellEffect oldEffect = cell.GetEffect();
 
-            cell.Redraw(effect);
+            board.RemoveCellEffect(cell);
+            board.SetCellEffect(cell, effect);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
 
@@ -241,8 +321,43 @@ namespace Match
             }
         }
 
+        private Player DetermineCurrBattleWinner()
+        {
+            int totalPower = 0;
+            int totalOpponentPower = 0;
+
+            foreach (Character character in battleCharacters[currPlayer])
+            {
+                totalPower += character.GetPower();
+            }
+            foreach (Character character in battleCharacters[currOpponent])
+            {
+                totalOpponentPower += character.GetPower();
+            }
+
+            if (totalPower > totalOpponentPower)
+            {
+                return currPlayer;
+            }
+            if (totalPower < totalOpponentPower)
+            {
+                return currOpponent;
+            }
+
+            return null;        // Draw
+        }
+
         public void FinishBattle(Player winner)
         {
+            if (winner != null)
+            {
+                Debug.Log("The battle is finished. The winner is player " + winner.id);
+            }
+            else
+            {
+                Debug.Log("The battle is finished. Draw");
+            }
+
             Cell cell = battles[currPlayer][0].GetCell();
 
             // Drawing the battle finishing
@@ -254,16 +369,16 @@ namespace Match
                 // Draw. Returning all the characters to hands
                 foreach (Character character in battleCharacters[currPlayer])
                 {
-                    board.ReturnCharacter(character);
+                    board.DestroyCharacter(character);
                     playersInfo[currPlayer].AddCheckToHand(checkFactory.GetCheck(
-                        character.GetStuffClass(), character.GetStartPower()));
+                        character.GetStuffClass(), character.GetLevel()));
                 }
 
                 foreach (Character character in battleCharacters[currOpponent])
                 {
-                    board.ReturnCharacter(character);
+                    board.DestroyCharacter(character);
                     playersInfo[currOpponent].AddCheckToHand(checkFactory.GetCheck(
-                        character.GetStuffClass(), character.GetStartPower()));
+                        character.GetStuffClass(), character.GetLevel()));
                 }
             }
             else
@@ -271,9 +386,9 @@ namespace Match
                 // Returning all the winner characters to his hand
                 foreach (Character character in battleCharacters[winner])
                 {
-                    board.ReturnCharacter(character);
+                    board.DestroyCharacter(character);
                     playersInfo[winner].AddCheckToHand(checkFactory.GetCheck(
-                        character.GetStuffClass(), character.GetStartPower()));
+                        character.GetStuffClass(), character.GetLevel()));
                 }
 
                 // Destroying all the loser characters
@@ -307,6 +422,8 @@ namespace Match
 
         public void PlayCard(Card card)
         {
+            cardPlayedThisTurn = true;
+
             if (isBattleNow)
             {
                 foreach (Battle battle in battles[currPlayer])
@@ -337,6 +454,11 @@ namespace Match
             {
                 card.Act(null, this);
             }
+        }
+
+        public Cell GetCellById(int id)
+        {
+            return board.GetCellById(id);
         }
 
         public List<Cell> GetAllCells()
@@ -394,7 +516,13 @@ namespace Match
 
         public void OpenCell(Cell cell, CellState newState)
         {
+            CellEffect effect = GetRandomCellEffect();
+
             cell.SetState(newState);
+            cell.SetEffect(effect);
+
+            board.OpenCell(cell);
+            board.SetCellEffect(cell, effect);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
 

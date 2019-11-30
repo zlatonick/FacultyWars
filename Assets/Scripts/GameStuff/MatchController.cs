@@ -9,6 +9,8 @@ namespace GameStuff
     {
         List<Character> GetAllCharacters();
 
+        Cell GetCellById(int id);
+
         List<Cell> GetAllCells();
 
         Player GetCurrMovingPlayer();

@@ -8,25 +8,29 @@ namespace BoardStuff
 {
     public class PlayerController : PlayerInfo
     {
-        StuffClass stuffClass;
+        private StuffClass stuffClass;
 
-        Dictionary<int, Card> cards;
+        private Dictionary<int, Card> cards;
 
-        Dictionary<int, Check> checkLevels;      // int is check level
+        private Dictionary<int, Check> checkLevels;      // int is check level
 
-        Dictionary<int, int> checks;          // Each check type count
+        private Dictionary<int, int> checks;          // Each check type count
 
-        List<Card> cardsPlayed;
+        private List<Card> cardsPlayed;
 
-        List<Check> checksDead;
+        private List<Check> checksDead;
 
-        List<int> battlesHistory;
+        private List<int> battlesHistory;
 
-        Action<Check, Cell> checkPlacedAction;
+        private bool actionsAreAllowed;
 
-        CardsManager cardsManager;
+        private Action<Check, Cell> checkPlacedAction;
+        private Action<Card> cardPlayedAction;
+        private Func<CardType> canPlayCardNow;
 
-        CheckManager checkManager;
+        private CardsManager cardsManager;
+
+        private CheckManager checkManager;
 
         public PlayerController(StuffClass stuffClass, CardsManager cardsManager,
             CheckManager checkManager, Dictionary<int, Check> checkLevels)
@@ -37,6 +41,8 @@ namespace BoardStuff
             this.checkLevels = checkLevels;
 
             checkManager.SetDragFinishedAction(OnCheckPlaced);
+            cardsManager.SetCardPlayedAction(OnCardPlayed);
+            cardsManager.SetCanPlayCardPredicate(CanPlayCard);
 
             cards = new Dictionary<int, Card>();
             cardsPlayed = new List<Card>();
@@ -54,8 +60,8 @@ namespace BoardStuff
 
             checkManager.SetStuffClass(stuffClass, checkPowers);
 
-            // DEBUG
-            checkManager.SetCanDrag(true);
+            checkManager.SetCanDrag(false);
+            actionsAreAllowed = false;
         }
 
         public void SetCheckPlacedAction(Action<Check, Cell> checkPlacedAction)
@@ -63,10 +69,47 @@ namespace BoardStuff
             this.checkPlacedAction = checkPlacedAction;
         }
 
+        public void SetCardPlayedAction(Action<Card> cardPlayedAction)
+        {
+            this.cardPlayedAction = cardPlayedAction;
+        }
+
+        public void SetCanPlayCardPredicate(Func<CardType> canPlayCardNow)
+        {
+            this.canPlayCardNow = canPlayCardNow;
+        }
+
         private void OnCheckPlaced(Cell cell, int checkLevel)
         {
             checks[checkLevel]--;
             checkPlacedAction(checkLevels[checkLevel], cell);
+        }
+
+        private void OnCardPlayed(int cardId)
+        {
+            cardsManager.RemoveCard(cardId);
+
+            Card card = cards[cardId];
+            
+            cards.Remove(cardId);
+            cardsPlayed.Add(card);
+
+            cardPlayedAction(card);
+        }
+
+        public bool CanPlayCard(int cardId)
+        {
+            if (actionsAreAllowed)
+            {
+                CardType maxCardType = canPlayCardNow();
+                Card card = cards[cardId];
+
+                return (int)card.GetCardType() >= (int)maxCardType;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void AddCardToHand(Card card)
@@ -108,19 +151,15 @@ namespace BoardStuff
             return checks;
         }
 
-        public void SetPlayingCardAction(Action<Card> action)
+        public void SetActionAfterCardIsPlayed(Action<Card> action)
         {
             throw new NotImplementedException();
         }
 
         public void SetActionsPermission(bool permission)
         {
-            // TODO
-        }
-
-        public void SetAllowedCardTypes(CardType cardType)
-        {
-            // TODO
+            actionsAreAllowed = permission;
+            checkManager.SetCanDrag(permission);
         }
 
         public void SetAllowedCharacters(bool allowed)

@@ -1,28 +1,50 @@
-﻿using GameStuff;
+﻿using BoardStuff;
+using GameStuff;
 using MetaInfo;
 
 namespace GameEngine
 {
     public class EngineImpl : Engine
     {
+        private StuffClass stuffClass;
+
+        private CheckFactory checkFactory;
+
+        private int lastCellPlacedOn;
+
+        private PlayerInfo playerInfo;
+
+        public EngineImpl(StuffClass stuffClass)
+        {
+            this.stuffClass = stuffClass;
+            playerInfo = new EnginePlayerController();
+
+            checkFactory = new CheckFactoryImpl();
+            lastCellPlacedOn = 0;
+        }
+
         public PlayerInfo GetPlayerInfo()
         {
-            throw new System.NotImplementedException();
+            return playerInfo;
         }
 
         public StuffClass GetStuffClass()
         {
-            return StuffClass.FICT;
+            return stuffClass;
         }
 
         public Card MakeBattleMove()
         {
-            throw new System.NotImplementedException();
+            return null;
         }
 
-        public PlayerMove MakeMove()
+        public PlayerMove MakeMove(MatchController controller)
         {
-            throw new System.NotImplementedException();
+            Check check = checkFactory.GetCheck(stuffClass, 1);
+            Cell cell = controller.GetCellById(lastCellPlacedOn);
+            lastCellPlacedOn++;
+
+            return new PlayerMove(check, cell);
         }
     }
 }

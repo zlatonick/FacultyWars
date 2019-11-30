@@ -8,6 +8,8 @@ namespace BoardStuff
     {
         int id;
 
+        int level;
+
         StuffClass stuffClass;
 
         int power;
@@ -22,10 +24,11 @@ namespace BoardStuff
 
         List<Action<int>> changePowerActions;
 
-        public CharacterImpl(int id, StuffClass stuffClass, int power,
+        public CharacterImpl(int id, StuffClass stuffClass, int level, int power,
             Player player, BoardStuffManager boardStuffManager)
         {
             this.id = id;
+            this.level = level;
             this.stuffClass = stuffClass;
             this.power = power;
             this.startPower = power;
@@ -39,6 +42,11 @@ namespace BoardStuff
         public int GetId()
         {
             return id;
+        }
+
+        public int GetLevel()
+        {
+            return level;
         }
 
         public void ChangePower(int changeBy)

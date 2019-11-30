@@ -9,15 +9,14 @@ namespace BoardStuff
 
         CellState GetState();
 
-        // Changing the cell state with redrawing the cell
         void SetState(CellState state);
 
         bool IsBlocked();
 
         void SetBlock(bool blocked);
 
-        CellEffect GetEffect();
+        void SetEffect(CellEffect effect);
 
-        void Redraw(CellEffect effect);
+        CellEffect GetEffect();
     }
 }

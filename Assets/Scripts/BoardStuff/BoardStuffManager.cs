@@ -52,9 +52,10 @@ namespace BoardStuff
 
         // ---------------- Cells
 
-        public GameObject cellClosedPrefab;
+        public GameObject cellPrefab;
 
-        public GameObject cellOpenedPrefab;
+        public Sprite cellClosedSprite;
+        public Sprite cellOpenededSprite;
 
         // Faculty icons game objects
         public GameObject iasaIcon;
@@ -98,11 +99,11 @@ namespace BoardStuff
         void Start()
         {
             // Cells
-            var cellPrefabRect = cellClosedPrefab.GetComponent<RectTransform>();
+            var cellPrefabRect = cellPrefab.GetComponent<RectTransform>();
             cellWidth = cellPrefabRect.sizeDelta.x * cellPrefabRect.localScale.x;
             cellHeight = cellPrefabRect.sizeDelta.y * cellPrefabRect.localScale.y;
 
-            cellOffset = 50;
+            cellOffset = 49;
             cellWidthClear = cellWidth - cellOffset;
 
             cells = new Dictionary<int, GameObject>();
@@ -130,14 +131,14 @@ namespace BoardStuff
                     -cellWidth / 2 + cellWidthClear * (i - 1),
                     -cellHeight / 2);
 
-                GameObject bottomCell = Instantiate(cellClosedPrefab, transform, false);
+                GameObject bottomCell = Instantiate(cellPrefab, transform, false);
                 bottomCell.transform.localPosition = bottomCellPos;
                 cells.Add(2 * i + 1, bottomCell);
 
                 // Top cell
-                Vector2 topCellPos = new Vector2(bottomCellPos.x + cellOffset, cellHeight / 2);
+                Vector2 topCellPos = new Vector2(bottomCellPos.x + cellOffset + 2, cellHeight / 2);
 
-                GameObject topCell = Instantiate(cellClosedPrefab, transform, false);
+                GameObject topCell = Instantiate(cellPrefab, transform, false);
                 topCell.transform.localPosition = topCellPos;
                 cells.Add(2 * i, topCell);
             }
@@ -161,24 +162,19 @@ namespace BoardStuff
 
         public void OpenCell(int cellId)
         {
-            GameObject newCell = Instantiate(cellOpenedPrefab, transform, false);
-            newCell.transform.localPosition = cells[cellId].transform.localPosition;
-
-            Destroy(cells[cellId]);
-
-            cells[cellId] = newCell;
+            cells[cellId].GetComponent<Button>().image.sprite = cellOpenededSprite;
         }
 
         public void SetEffect(int cellId, StuffClass stuffClass, int power)
         {
-            GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
-                transform, false);
-
             GameObject cell = cells[cellId];
             Vector2 cellPos = cell.transform.localPosition;
 
+            GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
+                cell.transform, false);
+
             stuffClassIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.177f * cellWidth, cellPos.y);
+                -0.177f * cellWidth, 0);
 
             Text middleText = cell.transform.Find("text_middle").gameObject.GetComponent<Text>();
             middleText.text = "" + (power > 0 ? "+" : "") + power;
@@ -189,18 +185,18 @@ namespace BoardStuff
         public void SetEffect(int cellId, StuffClass stuffClass, int power,
             StuffClass stuffClass2, int power2)
         {
-            GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
-                transform, false);
-            GameObject stuffClassIcon2 = Instantiate(GetIconOfStuffClass(stuffClass2),
-                transform, false);
-
             GameObject cell = cells[cellId];
             Vector2 cellPos = cell.transform.localPosition;
 
+            GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
+                cell.transform, false);
+            GameObject stuffClassIcon2 = Instantiate(GetIconOfStuffClass(stuffClass2),
+                cell.transform, false);
+
             stuffClassIcon.transform.localPosition = new Vector2(
-                cellPos.x - 0.13f * cellWidth, cellPos.y + cellHeight / 4);
+                -0.13f * cellWidth, cellHeight / 4);
             stuffClassIcon2.transform.localPosition = new Vector2(
-                cellPos.x - 0.224f * cellWidth, cellPos.y - cellHeight / 4);
+                -0.224f * cellWidth, -cellHeight / 4);
 
             Text topText = cell.transform.Find("text_top").gameObject.GetComponent<Text>();
             Text bottomText = cell.transform.Find("text_bottom").gameObject.GetComponent<Text>();

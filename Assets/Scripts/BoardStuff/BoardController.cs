@@ -27,7 +27,7 @@ namespace BoardStuff
 
             for (int i = 0; i < 2 * cellsPairsQuan; i++)
             {
-                Cell cell = new CellImpl(i, boardStuffManager);
+                Cell cell = new CellImpl(i);
                 cells.Add(i, cell);
                 cellsCharacters.Add(cell, new List<Character>());
             }
@@ -43,7 +43,7 @@ namespace BoardStuff
 
         public void FinishBattle(Cell cell, Player winner)
         {
-            throw new System.NotImplementedException();
+            // TODO
         }
 
         public List<Cell> GetAllCells()
@@ -94,24 +94,44 @@ namespace BoardStuff
             cellsCharacters.Remove(cell);
         }
 
-        public void ReturnCharacter(Character character)
+        public Character SpawnCharacter(StuffClass stuffClass, int level, int power, Player player, Cell cell)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Character SpawnCharacter(StuffClass stuffClass, int power, Player player, Cell cell)
-        {
-            Character character = characterFactory.CreateCharacter(stuffClass, power, player);
+            Character character = characterFactory.CreateCharacter(stuffClass, level, power, player);
 
             boardStuffManager.SpawnCharacter(cell.GetId(), character.GetId(),
                 stuffClass, power, player.id == 0);     // Main player has id = 0
 
+            cellsCharacters[cell].Add(character);
+
             return character;
+        }
+
+        public void OpenCell(Cell cell)
+        {
+            boardStuffManager.OpenCell(cell.GetId());
+        }
+
+        public void SetCellEffect(Cell cell, CellEffect cellEffect) 
+        {
+            if (cellEffect.EffectsQuan == 1)
+            {
+                boardStuffManager.SetEffect(cell.GetId(), cellEffect.StuffClass, cellEffect.Power);
+            }
+            else if (cellEffect.EffectsQuan == 2)
+            {
+                boardStuffManager.SetEffect(cell.GetId(), cellEffect.StuffClass, cellEffect.Power,
+                    cellEffect.StuffClass2, cellEffect.Power2);
+            }
+        }
+
+        public void RemoveCellEffect(Cell cell)
+        {
+            boardStuffManager.RemoveEffect(cell.GetId());
         }
 
         public void StartBattle(Cell cell)
         {
-            throw new System.NotImplementedException();
+            // TODO
         }
 
         public Cell GetCellByCoords(Vector2 coords)
@@ -119,6 +139,11 @@ namespace BoardStuff
             int cellId = boardStuffManager.GetCellIdByCoords(coords);
 
             return cellId == -1 ? null : cells[cellId];
+        }
+
+        public Cell GetCellById(int id)
+        {
+            return cells[id];
         }
     }
 }

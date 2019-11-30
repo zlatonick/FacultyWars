@@ -31,22 +31,29 @@ namespace Match
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            StuffPack.stuffClass = StuffClass.FPM;            
+            StuffPack.stuffClass = StuffClass.IASA;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
             // DEBUG
+            CardFactory cardFactory = new CardFactoryImpl();
+
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
+
+            // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 0));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffClass.FPM, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
 
             board = new BoardController(boardStuffManager, 4);
 
@@ -78,14 +85,16 @@ namespace Match
             }
 
             // Setting up the opponent (AI)
-            engine = EngineCreator.CreateEngine();
+            engine = EngineCreator.CreateEngine(StuffClass.FPM);
             opponent = new Player(1, engine.GetStuffClass());
 
             // Setting up the match controller
             matchController = new MatchControllerImpl(board,
-                player, playerInfo, opponent, /*engine.GetPlayerInfo()*/ null);
+                player, playerInfo, opponent, engine.GetPlayerInfo());
 
             playerInfo.SetCheckPlacedAction(CheckPlaced);
+            playerInfo.SetCardPlayedAction(CardPlayed);
+            playerInfo.SetCanPlayCardPredicate(matchController.GetAllowedCardTypes);
 
             // Starting the game
             if (matchController.GetCurrMovingPlayer() == player)
@@ -100,26 +109,49 @@ namespace Match
 
         private void StartPlayerTurn()
         {
+            Debug.Log("Player's turn");
+
             // TODO: Make "Your turn" animation
 
             // Allow user to play cards and characters
             playerInfo.SetActionsPermission(true);
-            playerInfo.SetAllowedCardTypes(matchController.GetAllowedCardTypes());
             playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
         }
 
         private void StartOpponentTurn()
         {
+            Debug.Log("Computer's turn");
+
             if (matchController.IsBattleNow())
             {
                 Card card = engine.MakeBattleMove();
-                matchController.PlayCard(card);
+
+                if (card != null)
+                {
+                    Debug.Log("Computer played a card");
+                    matchController.PlayCard(card);
+                }
+                else
+                {
+                    Debug.Log("Computer skipped his turn");
+                    matchController.FinishMove();
+                }
             }
             else
             {
                 // TODO: Add non-battle card moves
-                PlayerMove move = engine.MakeMove();
-                matchController.PlaceCheck(move.check, move.cell);
+                PlayerMove move = engine.MakeMove(matchController);
+
+                if (move != null)
+                {
+                    Debug.Log("Computer placed a check");
+                    matchController.PlaceCheck(move.check, move.cell);
+                }
+                else
+                {
+                    Debug.Log("Computer skipped his turn");
+                    matchController.FinishMove();
+                }
             }
 
             if (matchController.GetCurrMovingPlayer() == opponent)
@@ -136,7 +168,6 @@ namespace Match
         {
             if (matchController.GetCurrMovingPlayer() == player)
             {
-                playerInfo.SetAllowedCardTypes(matchController.GetAllowedCardTypes());
                 playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
             }
             else
@@ -147,6 +178,8 @@ namespace Match
 
         public void CardPlayed(Card card)
         {
+            Debug.Log("Player has played a card");
+
             matchController.PlayCard(card);
 
             UpdatePlayerTurn();
@@ -154,6 +187,8 @@ namespace Match
 
         public void CheckPlaced(Check check, Cell cell)
         {
+            Debug.Log("Player has placed a check");
+
             matchController.PlaceCheck(check, cell);
 
             UpdatePlayerTurn();

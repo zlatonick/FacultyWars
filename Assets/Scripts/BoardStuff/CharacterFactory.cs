@@ -14,9 +14,9 @@ namespace BoardStuff
             charactersCreated = 0;
         }
 
-        public Character CreateCharacter(StuffClass stuffClass, int power, Player player)
+        public Character CreateCharacter(StuffClass stuffClass, int level, int power, Player player)
         {
-            return new CharacterImpl(charactersCreated++, stuffClass,
+            return new CharacterImpl(charactersCreated++, stuffClass, level,
                 power, player, boardStuffManager);
         }
     }

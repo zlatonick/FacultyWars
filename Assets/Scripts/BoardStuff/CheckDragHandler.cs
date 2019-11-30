@@ -98,7 +98,6 @@ namespace BoardStuff
             {
                 Destroy(checkPrefab);
                 dragFinishedAction(this, canvas.ScreenToCanvasPosition(eventData.position));
-                //dragFinishedAction(this, eventData.position);
             }
         }
     }

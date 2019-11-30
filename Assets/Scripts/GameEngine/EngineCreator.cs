@@ -7,12 +7,12 @@ namespace GameEngine
     {
         public static Engine CreateEngine()
         {
-            return new EngineImpl();
+            return new EngineImpl(StuffClass.IASA);
         }
 
         public static Engine CreateEngine(StuffClass stuffClass)
         {
-            throw new NotImplementedException();
+            return new EngineImpl(stuffClass);
         }
     }
 }
