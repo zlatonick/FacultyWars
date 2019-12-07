@@ -26,7 +26,7 @@ namespace Preparing.list_items
 
         public void HandleClick()
         {
-            var item = new PickedShopItem() {itemTitle = _item.itemTitle, itemPrice = 5};
+            var item = new PickedShopItem() { id = _item.id, itemType = "Card", itemTitle = _item.itemTitle, itemPrice = 5};
             _scrollList.otherList.AddItem(item);
         }
     }
