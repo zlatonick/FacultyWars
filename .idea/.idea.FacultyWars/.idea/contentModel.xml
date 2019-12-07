@@ -95,6 +95,7 @@
               <e p="ShopPickedItemsPool.cs" t="Include" />
             </e>
             <e p="PreparingData.cs" t="Include" />
+            <e p="StartMatchEvent.cs" t="Include" />
             <e p="StuffPack.cs" t="Include" />
           </e>
         </e>

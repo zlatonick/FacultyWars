@@ -51,7 +51,7 @@ namespace Preparing.checks
 
         public void OnCheckClick(int price)
         {
-            var item = new PickedShopItem() {itemTitle = "+" + _shopCheck.power + " power", itemPrice = _shopCheck.price};
+            var item = new PickedShopItem() { level = index, itemType = "Check", itemTitle = "+" + _shopCheck.power + " power", itemPrice = _shopCheck.price};
             scrollList.otherList.AddItem(item);
         }
     }

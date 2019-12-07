@@ -10,6 +10,8 @@ namespace Preparing
     [Serializable]
     public class ShopItem
     {
+        public int id;
+        public int price;
         public string itemTitle;
     }
 

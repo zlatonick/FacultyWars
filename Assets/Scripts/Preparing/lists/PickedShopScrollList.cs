@@ -10,6 +10,10 @@ namespace Preparing
     [Serializable]
     public class PickedShopItem
     {
+        // 'Check' or 'Card'
+        public int id = -1;
+        public int level = -1;
+        public string itemType;
         public string itemTitle;
         public int itemPrice;
     }
