@@ -32,5 +32,9 @@ namespace GameStuff
         void SetActionsPermission(bool permission);
 
         void SetAllowedCharacters(bool allowed);
+
+        void AddCheckToDead(Check check);
+
+        void AddCardToPlayed(Card card);
     }
 }

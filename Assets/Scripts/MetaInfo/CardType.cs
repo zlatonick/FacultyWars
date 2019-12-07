@@ -5,6 +5,7 @@ namespace MetaInfo
     {
         GOLD,
         SILVER,
-        NEUTRAL
+        NEUTRAL,
+        NO_BATTLE
     }
 }

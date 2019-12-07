@@ -80,6 +80,12 @@ namespace BoardStuff
             // Creating the card
             CardClickHandler cardSource = null;
 
+            // No_battle texture = neutral
+            if (cardType == CardType.NO_BATTLE)
+            {
+                cardType = CardType.NEUTRAL;
+            }
+
             if (stuffClass == StuffClass.IASA) cardSource = iasaCards[(int)cardType];
             else if (stuffClass == StuffClass.FICT) cardSource = fictCards[(int)cardType];
             else if (stuffClass == StuffClass.FPM) cardSource = fpmCards[(int)cardType];

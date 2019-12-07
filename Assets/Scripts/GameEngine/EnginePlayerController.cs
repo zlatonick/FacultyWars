@@ -13,6 +13,16 @@ namespace GameEngine
 
         }
 
+        public void AddCardToPlayed(Card card)
+        {
+
+        }
+
+        public void AddCheckToDead(Check check)
+        {
+
+        }
+
         public void AddCheckToHand(Check check)
         {
 

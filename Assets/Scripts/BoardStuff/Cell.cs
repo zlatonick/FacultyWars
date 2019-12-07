@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using MetaInfo;
-
+﻿
 namespace BoardStuff
 {
     public interface Cell

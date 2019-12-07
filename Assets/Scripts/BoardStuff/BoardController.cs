@@ -39,6 +39,7 @@ namespace BoardStuff
         public void DestroyCharacter(Character character)
         {
             boardStuffManager.RemoveCharacter(character.GetId());
+            cellsCharacters[GetCharacterCell(character)].Remove(character);
         }
 
         public void FinishBattle(Cell cell, Player winner)

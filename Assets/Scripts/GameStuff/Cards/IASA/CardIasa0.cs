@@ -10,7 +10,7 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
-            battle.GetCharacter().ChangePower(20);
+            controller.ChangePowerSafe(battle.GetCharacter(), 20);
         }
 
         public override void Choose(Chooser chooser) { }
