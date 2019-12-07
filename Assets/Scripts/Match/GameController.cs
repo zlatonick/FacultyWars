@@ -31,7 +31,7 @@ namespace Match
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            StuffPack.stuffClass = StuffClass.IASA;            
+            /*StuffPack.stuffClass = StuffClass.IASA;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
@@ -53,7 +53,7 @@ namespace Match
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));*/
 
             board = new BoardController(boardStuffManager, 4);
 
