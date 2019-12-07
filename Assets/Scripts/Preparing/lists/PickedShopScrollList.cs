@@ -60,6 +60,9 @@ namespace Preparing
         
         public void AddItem(PickedShopItem item)
         {
+            if (money < item.itemPrice)
+                return; 
+            
             itemList.Add(item);
             money -= item.itemPrice;
             RefreshDisplay();

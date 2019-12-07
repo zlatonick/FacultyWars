@@ -22,27 +22,41 @@
             <e p="Board.cs" t="Include" />
             <e p="BoardController.cs" t="Include" />
             <e p="BoardCoordinates.cs" t="Include" />
+            <e p="BoardStuffManager.cs" t="Include" />
+            <e p="CanvasPositioningExtensions.cs" t="Include" />
+            <e p="CardClickHandler.cs" t="Include" />
+            <e p="CardsManager.cs" t="Include" />
             <e p="Cell.cs" t="Include" />
             <e p="CellEffect.cs" t="Include" />
             <e p="CellImpl.cs" t="Include" />
-            <e p="CellManager.cs" t="Include" />
             <e p="CellState.cs" t="Include" />
             <e p="Character.cs" t="Include" />
             <e p="CharacterFactory.cs" t="Include" />
             <e p="CharacterImpl.cs" t="Include" />
-            <e p="CharacterManager.cs" t="Include" />
+            <e p="CheckDragHandler.cs" t="Include" />
+            <e p="CheckManager.cs" t="Include" />
+            <e p="PlayerController.cs" t="Include" />
           </e>
           <e p="GameEngine" t="Include">
             <e p="Engine.cs" t="Include" />
             <e p="EngineCreator.cs" t="Include" />
+            <e p="EngineImpl.cs" t="Include" />
+            <e p="EnginePlayerController.cs" t="Include" />
           </e>
           <e p="GameStuff" t="Include">
             <e p="Battle.cs" t="Include" />
-            <e p="Card.cs" t="Include" />
             <e p="CardFactory.cs" t="Include" />
+            <e p="CardFactoryImpl.cs" t="Include" />
+            <e p="Cards" t="Include">
+              <e p="Card.cs" t="Include" />
+              <e p="IASA" t="Include">
+                <e p="CardIasa0.cs" t="Include" />
+              </e>
+            </e>
             <e p="Check.cs" t="Include" />
             <e p="CheckFactory.cs" t="Include" />
             <e p="CheckFactoryImpl.cs" t="Include" />
+            <e p="CheckImpl.cs" t="Include" />
             <e p="Chooser.cs" t="Include" />
             <e p="MatchController.cs" t="Include" />
             <e p="PlayerInfo.cs" t="Include" />
@@ -55,7 +69,6 @@
             <e p="BattleStatus.cs" t="Include" />
             <e p="GameController.cs" t="Include" />
             <e p="MatchControllerImpl.cs" t="Include" />
-            <e p="PlayerController.cs" t="Include" />
             <e p="PlayerMove.cs" t="Include" />
           </e>
           <e p="MetaInfo" t="Include">
@@ -64,6 +77,9 @@
             <e p="StuffClass.cs" t="Include" />
           </e>
           <e p="Preparing" t="Include">
+            <e p="checks" t="Include">
+              <e p="OnCheckItemClickListener.cs" t="Include" />
+            </e>
             <e p="list_items" t="Include">
               <e p="PickedShopItemButton.cs" t="Include" />
               <e p="ShopItemButton.cs" t="Include" />
