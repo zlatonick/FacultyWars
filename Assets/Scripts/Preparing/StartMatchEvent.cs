@@ -10,7 +10,7 @@ namespace Preparing
     {
         public PickedShopScrollList scrollList;
 
-        public void LoadSceneMode(string sceneName)
+        public void LoadSceneMode()
         {
             var checkFactory = new CheckFactoryImpl();
             var cardFactory = new CardFactoryImpl();
@@ -29,8 +29,8 @@ namespace Preparing
                 }
             }
 
-            Debug.Log("Loading Scene:" + sceneName);
-            SceneManager.LoadScene(sceneName);
+            Debug.Log("Loading Scene: Match");
+            SceneManager.LoadScene("Match");
         }
     }
 }
