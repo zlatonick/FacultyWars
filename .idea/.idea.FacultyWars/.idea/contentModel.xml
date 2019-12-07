@@ -21,7 +21,6 @@
           <e p="BoardStuff" t="Include">
             <e p="Board.cs" t="Include" />
             <e p="BoardController.cs" t="Include" />
-            <e p="BoardCoordinates.cs" t="Include" />
             <e p="BoardStuffManager.cs" t="Include" />
             <e p="CanvasPositioningExtensions.cs" t="Include" />
             <e p="CardClickHandler.cs" t="Include" />
@@ -48,9 +47,40 @@
             <e p="CardFactory.cs" t="Include" />
             <e p="CardFactoryImpl.cs" t="Include" />
             <e p="Cards" t="Include">
+              <e p="ALL" t="Include">
+                <e p="CardAll0.cs" t="Include" />
+              </e>
               <e p="Card.cs" t="Include" />
+              <e p="FICT" t="Include">
+                <e p="CardFict0.cs" t="Include" />
+                <e p="CardFict1.cs" t="Include" />
+                <e p="CardFict10.cs" t="Include" />
+                <e p="CardFict11.cs" t="Include" />
+                <e p="CardFict12.cs" t="Include" />
+                <e p="CardFict13.cs" t="Include" />
+                <e p="CardFict14.cs" t="Include" />
+                <e p="CardFict15.cs" t="Include" />
+                <e p="CardFict16.cs" t="Include" />
+                <e p="CardFict2.cs" t="Include" />
+                <e p="CardFict3.cs" t="Include" />
+                <e p="CardFict4.cs" t="Include" />
+                <e p="CardFict5.cs" t="Include" />
+                <e p="CardFict6.cs" t="Include" />
+                <e p="CardFict7.cs" t="Include" />
+                <e p="CardFict8.cs" t="Include" />
+                <e p="CardFict9.cs" t="Include" />
+              </e>
               <e p="IASA" t="Include">
                 <e p="CardIasa0.cs" t="Include" />
+                <e p="CardIasa1.cs" t="Include" />
+                <e p="CardIasa2.cs" t="Include" />
+                <e p="CardIasa3.cs" t="Include" />
+                <e p="CardIasa4.cs" t="Include" />
+                <e p="CardIasa5.cs" t="Include" />
+                <e p="CardIasa6.cs" t="Include" />
+                <e p="CardIasa7.cs" t="Include" />
+                <e p="CardIasa8.cs" t="Include" />
+                <e p="CardIasa9.cs" t="Include" />
               </e>
             </e>
             <e p="Check.cs" t="Include" />

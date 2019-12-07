@@ -1,23 +1,10 @@
-using System;
 using MetaInfo;
 
 namespace Preparing
 {
     public class PreparingData
     {
-        public static ShopItem[] shopItems = new[]
-        {
-            new ShopItem() {id = 0, itemTitle = "+ 10 to Power "},
-            new ShopItem() {id = 1, itemTitle = "+ 20 to Power "},
-            new ShopItem() {id = 2, itemTitle = "+ 30 to Power "},
-            new ShopItem() {id = 3, itemTitle = "+ 40 to Power "},
-            new ShopItem() {id = 4, itemTitle = "+ 50 to Power "},
-            new ShopItem() {id = 5, itemTitle = "+ 60 to Power "},
-            new ShopItem() {id = 6, itemTitle = "+ 70 to Power "},
-            new ShopItem() {id = 7, itemTitle = "+ 80 to Power "},
-            new ShopItem() {id = 8, itemTitle = "+ 90 to Power "},
-            new ShopItem() {id = 9, itemTitle = "+ 100 to Power "}
-        };
+        public static int cardCount = 10;
 
         public static ShopCheck[] shopChecksIasa = new[]
         {

@@ -448,11 +448,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 235857579}
         m_MethodName: OnCheckClick
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 100
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -502,11 +502,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 235857574}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67602f5433c7e4043a7ca91fedc931c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 1faed2adbba2b8445954bb49efec513a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   index: 0
-  scrollList: {fileID: 818073702}
+  scrollList: {fileID: 111780992}
   spriteIasa: {fileID: 21300000, guid: 678189a71dbef444584a54a57ccdafb9, type: 3}
   spriteFict: {fileID: 21300000, guid: 900bad88e2d2f80499afa1914a64cec0, type: 3}
   spriteFpm: {fileID: 21300000, guid: 5b8cec58abf1401479002f05dd6a03aa, type: 3}
@@ -970,7 +970,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 709871490}
         m_MethodName: OnCheckClick
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1024,11 +1024,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 709871485}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67602f5433c7e4043a7ca91fedc931c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 1faed2adbba2b8445954bb49efec513a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   index: 1
-  scrollList: {fileID: 818073702}
+  scrollList: {fileID: 111780992}
   spriteIasa: {fileID: 21300000, guid: 678189a71dbef444584a54a57ccdafb9, type: 3}
   spriteFict: {fileID: 21300000, guid: 900bad88e2d2f80499afa1914a64cec0, type: 3}
   spriteFpm: {fileID: 21300000, guid: 5b8cec58abf1401479002f05dd6a03aa, type: 3}
@@ -1162,6 +1162,9 @@ MonoBehaviour:
   contentPanel: {fileID: 818073701}
   itemsPool: {fileID: 587134288}
   otherList: {fileID: 111780992}
+  spriteGoldCard: {fileID: 21300000, guid: bfa5444e2df6bcc44832d43f1f790116, type: 3}
+  spriteSilverCard: {fileID: 21300000, guid: f661bff187cc66c4383ece27a59796af, type: 3}
+  spriteNeutralCard: {fileID: 21300000, guid: 0de1112ac1a14264d8df2050158de0c5, type: 3}
   cardPrefab: {fileID: 7535605640498508648, guid: 00284589779914501b3f0372e03a5648,
     type: 3}
   cardOffset: 0
@@ -1708,7 +1711,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1123289831}
         m_MethodName: OnCheckClick
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1762,11 +1765,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1123289826}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67602f5433c7e4043a7ca91fedc931c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 1faed2adbba2b8445954bb49efec513a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   index: 2
-  scrollList: {fileID: 818073702}
+  scrollList: {fileID: 111780992}
   spriteIasa: {fileID: 21300000, guid: 678189a71dbef444584a54a57ccdafb9, type: 3}
   spriteFict: {fileID: 21300000, guid: 900bad88e2d2f80499afa1914a64cec0, type: 3}
   spriteFpm: {fileID: 21300000, guid: 5b8cec58abf1401479002f05dd6a03aa, type: 3}

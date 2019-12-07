@@ -1,5 +1,6 @@
 ﻿using System;
 using MetaInfo;
+using Preparing.lists;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -9,7 +10,7 @@ namespace Preparing.checks
     public class OnCheckItemClickListener : MonoBehaviour
     {
         public int index;
-        public ShopScrollList scrollList;
+        public PickedShopScrollList scrollList;
         public Sprite spriteIasa;
         public Sprite spriteFict;
         public Sprite spriteFpm;
@@ -49,10 +50,10 @@ namespace Preparing.checks
             this.gameObject.transform.parent.GetComponentsInChildren<Text>()[1].text = _shopCheck.price + "$";
         }
 
-        public void OnCheckClick(int price)
+        public void OnCheckClick()
         {
             var item = new PickedShopItem() { level = index, itemType = "Check", itemTitle = "+" + _shopCheck.power + " power", itemPrice = _shopCheck.price};
-            scrollList.otherList.AddItem(item);
+            scrollList.AddItem(item);
         }
     }
 }
