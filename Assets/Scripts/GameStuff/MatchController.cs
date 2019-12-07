@@ -9,7 +9,11 @@ namespace GameStuff
     {
         List<Character> GetAllCharacters();
 
+        List<Character> GetCharactersOnCell(Cell cell);     // In correct order
+
         Cell GetCellById(int id);
+
+        Cell GetCharacterCell(Character character);
 
         List<Cell> GetAllCells();
 
@@ -27,9 +31,11 @@ namespace GameStuff
 
         void PlaceCheck(Check check, Cell cell);
 
+        void ChangePowerSafe(Character character, int changeBy);
+
         void SetAfterBattleAction(Action<Player> action);
 
-        void SetAfterNTurnsAction(Action action, int n);
+        void SetAfterNTurnsAction(int n, Action action);
 
         void FinishBattle(Player winner);
 
@@ -40,5 +46,7 @@ namespace GameStuff
         void ChangeCellEffect(Cell cell, CellEffect effect);
 
         void OpenCell(Cell cell, CellState newState);
+
+        PlayerInfo GetPlayerInfo(Player player);
     }
 }

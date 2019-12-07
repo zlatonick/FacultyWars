@@ -2067,8 +2067,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 4764281645905259075, guid: 0596b3056e583ff4fb27872ce9d5bccc,
     type: 3}
-  cellClosedSprite: {fileID: 21300000, guid: f7c11ba1e364ab24e82a53ca3a6c9791, type: 3}
-  cellOpenededSprite: {fileID: 21300000, guid: 068b7abe592beb74da88dcd8d96457d6, type: 3}
+  cellSprite: {fileID: 0}
   iasaIcon: {fileID: 381442598516438580, guid: 70f5795e384da4a47baf58bca85ea252, type: 3}
   fictIcon: {fileID: 4141793205008828661, guid: 89520f189cce1f240a95017061ff8455,
     type: 3}

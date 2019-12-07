@@ -4,8 +4,10 @@ namespace GameStuff
 {
     public interface Chooser
     {
-        Character ChooseCharacter();
+        Character ChooseCharacter(string message);
 
-        Cell ChooseCell();
+        Cell ChooseCell(string message);
+
+        Check ChooseCheck(string message);
     }
 }

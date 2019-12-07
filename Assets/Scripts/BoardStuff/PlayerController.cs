@@ -166,5 +166,15 @@ namespace BoardStuff
         {
             checkManager.SetCanDrag(allowed);
         }
+
+        public void AddCheckToDead(Check check)
+        {
+            checksDead.Add(check);
+        }
+
+        public void AddCardToPlayed(Card card)
+        {
+            cardsPlayed.Add(card);
+        }
     }
 }

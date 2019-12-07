@@ -85,7 +85,7 @@ namespace Match
             }
 
             // Setting up the opponent (AI)
-            engine = EngineCreator.CreateEngine(StuffClass.FPM);
+            engine = EngineCreator.CreateEngine(StuffClass.FICT);
             opponent = new Player(1, engine.GetStuffClass());
 
             // Setting up the match controller

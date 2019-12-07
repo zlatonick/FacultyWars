@@ -54,8 +54,7 @@ namespace BoardStuff
 
         public GameObject cellPrefab;
 
-        public Sprite cellClosedSprite;
-        public Sprite cellOpenededSprite;
+        public Sprite cellSprite;
 
         // Faculty icons game objects
         public GameObject iasaIcon;
@@ -119,7 +118,7 @@ namespace BoardStuff
             characters = new Dictionary<int, List<CharacterInfo>>();
             charsCells = new Dictionary<int, int>();
 
-            characterOffset = 10;
+            characterOffset = 23;
         }
 
         public void FillBoardWithCells(int pairCellsQuan)
@@ -162,7 +161,8 @@ namespace BoardStuff
 
         public void OpenCell(int cellId)
         {
-            cells[cellId].GetComponent<Button>().image.sprite = cellOpenededSprite;
+            Animator animator = cells[cellId].GetComponent<Animator>();
+            animator.SetInteger("cellState", 1);
         }
 
         public void SetEffect(int cellId, StuffClass stuffClass, int power)
@@ -239,7 +239,11 @@ namespace BoardStuff
         public void RemoveCell(int cellId)
         {
             RemoveEffect(cellId);
-            Destroy(cells[cellId]);
+
+            // Animating the vanish
+            Animator animator = cells[cellId].GetComponent<Animator>();
+            animator.SetInteger("cellState", 2);
+
             cells.Remove(cellId);
         }
 

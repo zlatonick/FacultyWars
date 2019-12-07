@@ -36,9 +36,15 @@ namespace Match
 
         Dictionary<Player, BattleStatus> battleStatuses;
 
-        // Factories
+        Action<Player> afterBattleAction;
+
+        Dictionary<Action, int> afterNTurnsActions;     // Action -> moves left to action
+
+        // Additional objects
 
         CheckFactory checkFactory;
+
+        Chooser chooser;
 
         public MatchControllerImpl(Board board, Player player1, PlayerInfo playerInfo1,
             Player player2, PlayerInfo playerInfo2)
@@ -92,6 +98,9 @@ namespace Match
 
             battleStatuses.Add(player1, BattleStatus.NO_BATTLE);
             battleStatuses.Add(player2, BattleStatus.NO_BATTLE);
+
+            afterBattleAction = null;
+            afterNTurnsActions = new Dictionary<Action, int>();
         }
 
         private static int GetRandomEffectPower(System.Random random)
@@ -152,6 +161,7 @@ namespace Match
 
         private void ChangeMove()
         {
+            // Tracking the battle status
             if (isBattleNow && !cardPlayedThisTurn)
             {
                 turnsWithoutPlayingCards++;
@@ -168,6 +178,7 @@ namespace Match
             }
             cardPlayedThisTurn = false;
 
+            // Swapping the players
             if (changePlayersAfterMoveFinished)
             {
                 Player temp = currPlayer;
@@ -179,9 +190,25 @@ namespace Match
             {
                 changePlayersAfterMoveFinished = true;
             }
+
+            // Executing the action, if needed
+            if (afterNTurnsActions.Count > 0)
+            {
+                var keys = afterNTurnsActions.Keys;
+                foreach (var key in keys)
+                {
+                    afterNTurnsActions[key]--;
+
+                    if (afterNTurnsActions[key] <= 0)
+                    {
+                        key();
+                        afterNTurnsActions.Remove(key);
+                    }
+                }
+            }
         }
 
-        private void ChangePowerSafe(Character character, int changeBy)
+        public void ChangePowerSafe(Character character, int changeBy)
         {
             int currPower = character.GetPower();
 
@@ -298,6 +325,16 @@ namespace Match
             }
         }
 
+        public PlayerInfo GetPlayerInfo(Player player)
+        {
+            return playersInfo[player];
+        }
+
+        public List<Character> GetCharactersOnCell(Cell cell)
+        {
+            return board.GetCharactersOnCell(cell);
+        }
+
         public void ChangeCellEffect(Cell cell, CellEffect effect)
         {
             // Redrawing the cell
@@ -396,6 +433,8 @@ namespace Match
                 foreach (Character character in battleCharacters[looser])
                 {
                     board.DestroyCharacter(character);
+                    playersInfo[looser].AddCheckToDead(checkFactory.GetCheck(
+                        character.GetStuffClass(), character.GetLevel()));
                 }
             }
 
@@ -404,6 +443,13 @@ namespace Match
 
             // Stopping the battle
             StopBattle();
+
+            // Executing after battle action
+            if (afterBattleAction != null)
+            {
+                afterBattleAction(winner);
+                afterBattleAction = null;
+            }
         }
 
         private void StopBattle()
@@ -423,6 +469,12 @@ namespace Match
         public void PlayCard(Card card)
         {
             cardPlayedThisTurn = true;
+            playersInfo[currPlayer].AddCardToPlayed(card);
+
+            if (card.IsChoosing())
+            {
+                card.Choose(chooser);
+            }
 
             if (isBattleNow)
             {
@@ -459,6 +511,11 @@ namespace Match
         public Cell GetCellById(int id)
         {
             return board.GetCellById(id);
+        }
+
+        public Cell GetCharacterCell(Character character)
+        {
+            return board.GetCharacterCell(character);
         }
 
         public List<Cell> GetAllCells()
@@ -535,12 +592,19 @@ namespace Match
 
         public void SetAfterBattleAction(Action<Player> action)
         {
-            throw new NotImplementedException();
+            if (afterBattleAction == null)
+            {
+                afterBattleAction = action;
+            }
+            else
+            {
+                afterBattleAction += action;
+            }
         }
 
-        public void SetAfterNTurnsAction(Action action, int n)
+        public void SetAfterNTurnsAction(int n, Action action)
         {
-            throw new NotImplementedException();
+            afterNTurnsActions.Add(action, n * 2);
         }
 
         public void ChangePlayersAfterMoveFinished(bool change)
@@ -574,7 +638,7 @@ namespace Match
             }
             else
             {
-                return CardType.NEUTRAL;
+                return CardType.NO_BATTLE;
             }
         }
 
