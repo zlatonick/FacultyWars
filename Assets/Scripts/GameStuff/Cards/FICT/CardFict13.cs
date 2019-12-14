@@ -13,7 +13,5 @@ namespace GameStuff
         {
             controller.ChangePlayersAfterMoveFinished(false);
         }
-
-        public override void Choose(Chooser chooser) { }
     }
 }

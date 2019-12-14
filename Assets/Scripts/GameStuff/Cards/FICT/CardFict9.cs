@@ -1,11 +1,14 @@
 ﻿using BoardStuff;
 using MetaInfo;
+using System;
 
 namespace GameStuff
 {
     public class CardFict9 : Card
     {
-        Character characterToMove;
+        private Action<Card> afterChoosingAction;
+
+        private Character characterToMove;
 
         public CardFict9()
             : base(9, 60, CardType.SILVER, StuffClass.FICT, true,
@@ -18,9 +21,16 @@ namespace GameStuff
             controller.MoveCharacter(characterToMove, battle.GetCell());
         }
 
-        public override void Choose(Chooser chooser)
+        public override void Choose(Chooser chooser, Action<Card> afterChoosingAction)
         {
-            characterToMove = chooser.ChooseCharacter("Выберите персонажа для перемещения");
+            this.afterChoosingAction = afterChoosingAction;
+            chooser.ChooseCharacter("Выберите персонажа для перемещения", SetCharacterToMove);
+        }
+
+        public void SetCharacterToMove(Character characterToMove)
+        {
+            this.characterToMove = characterToMove;
+            afterChoosingAction(this);
         }
     }
 }

@@ -167,6 +167,7 @@ GameObject:
   - component: {fileID: 9046343774236203100}
   - component: {fileID: 2137253480083953981}
   - component: {fileID: 345513924822992324}
+  - component: {fileID: 8531456580860259206}
   m_Layer: 5
   m_Name: Cell
   m_TagString: Untagged
@@ -255,7 +256,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.4117647, g: 0.50980395, b: 0.16862746, a: 1}
     m_HighlightedColor: {r: 0.4117647, g: 0.50980395, b: 0.16862746, a: 0.78431374}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.41176474, g: 0.50980395, b: 0.16862746, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -294,6 +295,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8531456580860259206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4764281645905259075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eff6b9dd05df04944b6e9d26782721a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7472453655555449527
 GameObject:
   m_ObjectHideFlags: 0

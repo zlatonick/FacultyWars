@@ -13,12 +13,12 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
-            List<Character> characters = controller.GetAllCharacters();
+            List<Character> characters = new List<Character>(controller.GetAllCharacters());
             characters.RemoveAll(character => character.GetPlayer() != battle.GetPlayer());
 
             controller.ChangePowerSafe(battle.GetCharacter(), characters.Count * 20);
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

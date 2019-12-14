@@ -17,6 +17,6 @@ namespace GameStuff
                 playerInfo.GetChecksDead().Count * 10);
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

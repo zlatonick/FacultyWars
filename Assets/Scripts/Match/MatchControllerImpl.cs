@@ -30,6 +30,8 @@ namespace Match
         int turnsWithoutPlayingCards;       // 2 turns - finishing the battle
         bool cardPlayedThisTurn;
 
+        bool dontCloseCellAfterBattle;
+
         Dictionary<Player, List<Battle>> battles;
 
         Dictionary<Player, List<Character>> battleCharacters;
@@ -37,6 +39,8 @@ namespace Match
         Dictionary<Player, BattleStatus> battleStatuses;
 
         Action<Player> afterBattleAction;
+
+        Dictionary<Player, Action<Card>> afterCardIsPlayedActions;
 
         Dictionary<Action, int> afterNTurnsActions;     // Action -> moves left to action
 
@@ -46,10 +50,14 @@ namespace Match
 
         Chooser chooser;
 
-        public MatchControllerImpl(Board board, Player player1, PlayerInfo playerInfo1,
-            Player player2, PlayerInfo playerInfo2)
+        CardsDemonstrator cardsDemonstrator;
+
+        public MatchControllerImpl(Board board, Chooser chooser, CardsDemonstrator cardsDemonstrator,
+            Player player1, PlayerInfo playerInfo1, Player player2, PlayerInfo playerInfo2)
         {
             this.board = board;
+            this.chooser = chooser;
+            this.cardsDemonstrator = cardsDemonstrator;
 
             // Setting the players info
             playersInfo = new Dictionary<Player, PlayerInfo>();
@@ -93,6 +101,7 @@ namespace Match
             isBattleNow = false;
             turnsWithoutPlayingCards = 0;
             cardPlayedThisTurn = false;
+            dontCloseCellAfterBattle = false;
 
             battleStatuses = new Dictionary<Player, BattleStatus>();
 
@@ -101,6 +110,10 @@ namespace Match
 
             afterBattleAction = null;
             afterNTurnsActions = new Dictionary<Action, int>();
+
+            afterCardIsPlayedActions = new Dictionary<Player, Action<Card>>();
+            afterCardIsPlayedActions.Add(player1, null);
+            afterCardIsPlayedActions.Add(player2, null);
         }
 
         private static int GetRandomEffectPower(System.Random random)
@@ -439,7 +452,15 @@ namespace Match
             }
 
             // Closing the cell
-            board.RemoveCell(cell);
+            if (!dontCloseCellAfterBattle)
+            {
+                board.RemoveCell(cell);
+            }
+            else
+            {
+                cell.SetState(CellState.OPENED);
+                dontCloseCellAfterBattle = false;
+            }
 
             // Stopping the battle
             StopBattle();
@@ -450,6 +471,10 @@ namespace Match
                 afterBattleAction(winner);
                 afterBattleAction = null;
             }
+
+            // Removing the after card is played actions
+            afterCardIsPlayedActions[currPlayer] = null;
+            afterCardIsPlayedActions[currOpponent] = null;
         }
 
         private void StopBattle()
@@ -468,13 +493,21 @@ namespace Match
 
         public void PlayCard(Card card)
         {
-            cardPlayedThisTurn = true;
-            playersInfo[currPlayer].AddCardToPlayed(card);
-
             if (card.IsChoosing())
             {
-                card.Choose(chooser);
+                card.Choose(chooser, PlayCardAfterChoosing);
             }
+            else
+            {
+                PlayCardAfterChoosing(card);
+            }
+        }
+
+        private void PlayCardAfterChoosing(Card card)
+        {
+            cardPlayedThisTurn = true;
+            playersInfo[currPlayer].AddCardToPlayed(card);
+            cardsDemonstrator.DemonstrateCard(card.GetStuffClass(), card.GetCardType(), card.GetText());
 
             if (isBattleNow)
             {
@@ -506,6 +539,10 @@ namespace Match
             {
                 card.Act(null, this);
             }
+
+            // After play card actions
+            afterCardIsPlayedActions[currPlayer]?.Invoke(card);
+
         }
 
         public Cell GetCellById(int id)
@@ -531,6 +568,11 @@ namespace Match
         public bool IsBattleNow()
         {
             return isBattleNow;
+        }
+
+        public void DontCloseCellAfterBattle(bool dontClose)
+        {
+            dontCloseCellAfterBattle = dontClose;
         }
 
         public void FinishMove()
@@ -582,9 +624,10 @@ namespace Match
             board.SetCellEffect(cell, effect);
 
             List<Character> characters = board.GetCharactersOnCell(cell);
+            List<Character> charactersCopy = new List<Character>(characters);
 
             // Adding the effect to characters
-            foreach (Character character in characters)
+            foreach (Character character in charactersCopy)
             {
                 AddCellEffectToCharacter(character, cell.GetEffect());
             }
@@ -605,6 +648,18 @@ namespace Match
         public void SetAfterNTurnsAction(int n, Action action)
         {
             afterNTurnsActions.Add(action, n * 2);
+        }
+
+        public void SetActionAfterCardIsPlayed(Player player, Action<Card> action)
+        {
+            if (afterCardIsPlayedActions[player] == null)
+            {
+                afterCardIsPlayedActions[player] = action;
+            }
+            else
+            {
+                afterCardIsPlayedActions[player] += action;
+            }
         }
 
         public void ChangePlayersAfterMoveFinished(bool change)

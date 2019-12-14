@@ -1,13 +1,19 @@
 ﻿using BoardStuff;
 using MetaInfo;
+using System;
 using System.Collections.Generic;
 
 namespace GameStuff
 {
     public class CardFict11 : Card
     {
-        Character character1;
-        Character character2;
+        private Chooser chooser;
+
+        private Action<Card> afterChoosingAction;
+
+        private Character character1;
+
+        private Character character2;
 
         public CardFict11()
             : base(11, 20, CardType.NO_BATTLE, StuffClass.FICT, true,
@@ -23,10 +29,23 @@ namespace GameStuff
             controller.MoveCharacter(character2, сell2);
         }
 
-        public override void Choose(Chooser chooser) 
+        public override void Choose(Chooser chooser, Action<Card> afterChoosingAction)
         {
-            character1 = chooser.ChooseCharacter("Выберите первого персонажа");
-            character2 = chooser.ChooseCharacter("Выберите второго персонажа");
+            this.chooser = chooser;
+            this.afterChoosingAction = afterChoosingAction;
+            chooser.ChooseCharacter("Выберите первого персонажа", ChooseSecond);
+        }
+
+        public void ChooseSecond(Character character1)
+        {
+            this.character1 = character1;
+            chooser.ChooseCharacter("Выберите второго персонажа", AfterBothWereChosen);
+        }
+
+        public void AfterBothWereChosen(Character character2)
+        {
+            this.character2 = character2;
+            afterChoosingAction(this);
         }
     }
 }

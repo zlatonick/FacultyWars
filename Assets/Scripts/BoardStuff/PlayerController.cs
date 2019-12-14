@@ -25,8 +25,9 @@ namespace BoardStuff
         private bool actionsAreAllowed;
 
         private Action<Check, Cell> checkPlacedAction;
-        private Action<Card> cardPlayedAction;
         private Func<CardType> canPlayCardNow;
+        private Action<Check> checkClickedAction;
+        private Action<Card> cardPlayedAction;
 
         private CardsManager cardsManager;
 
@@ -41,6 +42,7 @@ namespace BoardStuff
             this.checkLevels = checkLevels;
 
             checkManager.SetDragFinishedAction(OnCheckPlaced);
+            checkManager.SetCheckClickedAction(OnCheckClicked);
             cardsManager.SetCardPlayedAction(OnCardPlayed);
             cardsManager.SetCanPlayCardPredicate(CanPlayCard);
 
@@ -69,6 +71,11 @@ namespace BoardStuff
             this.checkPlacedAction = checkPlacedAction;
         }
 
+        public void SetCheckClickedAction(Action<Check> checkClickedAction)
+        {
+            this.checkClickedAction = checkClickedAction;
+        }
+
         public void SetCardPlayedAction(Action<Card> cardPlayedAction)
         {
             this.cardPlayedAction = cardPlayedAction;
@@ -83,6 +90,11 @@ namespace BoardStuff
         {
             checks[checkLevel]--;
             checkPlacedAction(checkLevels[checkLevel], cell);
+        }
+
+        private void OnCheckClicked(int checkLevel)
+        {
+            checkClickedAction(checkLevels[checkLevel]);
         }
 
         private void OnCardPlayed(int cardId)
@@ -149,11 +161,6 @@ namespace BoardStuff
         public Dictionary<int, int> GetChecksInHand()
         {
             return checks;
-        }
-
-        public void SetActionAfterCardIsPlayed(Action<Card> action)
-        {
-            throw new NotImplementedException();
         }
 
         public void SetActionsPermission(bool permission)

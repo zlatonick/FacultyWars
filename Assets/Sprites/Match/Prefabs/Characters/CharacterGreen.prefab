@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8085173719452544415}
   - component: {fileID: 9181111114656465542}
   - component: {fileID: 8034789303771965485}
+  - component: {fileID: 2427310756652302218}
   m_Layer: 5
   m_Name: CharacterGreen
   m_TagString: Untagged
@@ -74,6 +75,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2427310756652302218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8712953890396420713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5020c97855dc5d847a16a08d4628802a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8937340868532378692
 GameObject:
   m_ObjectHideFlags: 0

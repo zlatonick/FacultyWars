@@ -13,7 +13,5 @@ namespace GameStuff
         {
             controller.ChangePowerSafe(battle.GetCharacter(), 10);
         }
-
-        public override void Choose(Chooser chooser) { }
     }
 }

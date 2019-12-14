@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace BoardStuff
 {
     public class CheckDragHandler : MonoBehaviour, IDragHandler,
-        IBeginDragHandler, IEndDragHandler
+        IBeginDragHandler, IEndDragHandler, IPointerClickHandler
     {
         private Canvas canvas;
 
@@ -22,6 +22,8 @@ namespace BoardStuff
         private int level;
 
         private Action<CheckDragHandler, Vector2> dragFinishedAction;
+
+        private Action<CheckDragHandler> clickedAction;
 
         void Start()
         {
@@ -71,6 +73,11 @@ namespace BoardStuff
             this.dragFinishedAction = dragFinishedAction;
         }
 
+        public void SetClickedAction(Action<CheckDragHandler> clickedAction)
+        {
+            this.clickedAction = clickedAction;
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (canDrag)
@@ -99,6 +106,11 @@ namespace BoardStuff
                 Destroy(checkPrefab);
                 dragFinishedAction(this, canvas.ScreenToCanvasPosition(eventData.position));
             }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            clickedAction(this);
         }
     }
 }

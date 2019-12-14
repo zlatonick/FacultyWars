@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4193882940422704799}
   - component: {fileID: 3850084082323087750}
   - component: {fileID: 2704036318271376173}
+  - component: {fileID: 3068542007764611626}
   m_Layer: 5
   m_Name: CharacterRed
   m_TagString: Untagged
@@ -74,6 +75,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3068542007764611626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3669665821238630761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5020c97855dc5d847a16a08d4628802a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3891168161898807108
 GameObject:
   m_ObjectHideFlags: 0

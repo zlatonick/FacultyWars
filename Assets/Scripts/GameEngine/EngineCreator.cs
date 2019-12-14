@@ -1,4 +1,5 @@
-﻿using MetaInfo;
+﻿using GameStuff;
+using MetaInfo;
 
 namespace GameEngine
 {
@@ -6,12 +7,12 @@ namespace GameEngine
     {
         public static Engine CreateEngine()
         {
-            return new EngineImpl(StuffClass.IASA);
+            return new EngineImpl(StuffClass.IASA, CheckLevels.GetCheckLevels(StuffClass.IASA));
         }
 
         public static Engine CreateEngine(StuffClass stuffClass)
         {
-            return new EngineImpl(stuffClass);
+            return new EngineImpl(stuffClass, CheckLevels.GetCheckLevels(stuffClass));
         }
     }
 }

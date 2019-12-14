@@ -14,6 +14,6 @@ namespace GameStuff
             controller.FinishBattle(battle.GetPlayer());
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

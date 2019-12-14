@@ -14,16 +14,17 @@ namespace GameStuff
         public override void Act(Battle battle, MatchController controller)
         {
             List<Character> characters = controller.GetAllCharacters();
-            characters.RemoveAll(character => character.GetPlayer() != battle.GetPlayer());
-
             PlayerInfo playerInfo = controller.GetPlayerInfo(battle.GetPlayer());
 
-            for (int i = 0; i < characters.Count; i++)
+            foreach (Character character in characters)
             {
-                playerInfo.AddCardToHand(new CardAll0(GetStuffClass()));
+                if (character.GetPlayer() == battle.GetPlayer())
+                {
+                    playerInfo.AddCardToHand(new CardAll0(GetStuffClass()));
+                }
             }
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

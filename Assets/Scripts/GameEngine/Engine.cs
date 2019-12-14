@@ -5,11 +5,13 @@ namespace GameEngine
 {
     public interface Engine
     {
+        void SetMatchController(MatchController controller);
+
         StuffClass GetStuffClass();
 
         PlayerInfo GetPlayerInfo();
 
-        PlayerMove MakeMove(MatchController controller);
+        PlayerMove MakeMove();
 
         Card MakeBattleMove();
     }

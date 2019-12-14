@@ -52,7 +52,7 @@ namespace BoardStuff
         public void ChangePower(int changeBy)
         {
             power += changeBy;
-            boardStuffManager.ChangeCharacterPower(id, power);
+            boardStuffManager.ChangeCharacterPower(id, power, changeBy);
 
             foreach (Action<int> action in changePowerActions)
             {

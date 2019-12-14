@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MetaInfo;
 using UnityEngine;
 
@@ -14,9 +15,21 @@ namespace BoardStuff
 
         private CharacterFactory characterFactory;
 
-        public BoardController(BoardStuffManager boardStuffManager, int cellsPairsQuan)
+        private Action<Cell> cellClickedAction;
+
+        private Action<Character> characterClickedAction;
+
+        public BoardController(BoardStuffManager boardStuffManager, int cellsPairsQuan,
+            Action<Cell> cellClickedAction, Action<Character> characterClickedAction)
         {
             this.boardStuffManager = boardStuffManager;
+
+            // Actions
+            this.cellClickedAction = cellClickedAction;
+            this.characterClickedAction = characterClickedAction;
+
+            this.boardStuffManager.SetCellClickedAction(OnCellClicked);
+            this.boardStuffManager.SetCharacterClickedAction(OnCharacterClicked);
 
             // Creating all the cell prefabs
             boardStuffManager.FillBoardWithCells(cellsPairsQuan);
@@ -84,7 +97,10 @@ namespace BoardStuff
 
         public void MoveCharacterToCell(Character character, Cell cell)
         {
-            throw new System.NotImplementedException();
+            cellsCharacters[GetCharacterCell(character)].Remove(character);
+            cellsCharacters[cell].Add(character);
+
+            boardStuffManager.MoveCharacterToCell(character.GetId(), cell.GetId());
         }
 
         public void RemoveCell(Cell cell)
@@ -139,12 +155,35 @@ namespace BoardStuff
         {
             int cellId = boardStuffManager.GetCellIdByCoords(coords);
 
-            return cellId == -1 ? null : cells[cellId];
+            if (cellId == -1) return null;
+            Cell cell = cells[cellId];
+
+            // Checking if the cell is not blocked
+            if (cell.IsBlocked()) return null;
+
+            return cell;
         }
 
         public Cell GetCellById(int id)
         {
             return cells[id];
+        }
+
+        public void OnCellClicked(int cellId)
+        {
+            cellClickedAction(cells[cellId]);
+        }
+
+        public void OnCharacterClicked(int characterId, int cellId)
+        {
+            // Finding the character by id
+            foreach (Character character in cellsCharacters[cells[cellId]])
+            {
+                if (character.GetId() == characterId)
+                {
+                    characterClickedAction(character);
+                }
+            }
         }
     }
 }

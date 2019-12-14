@@ -1,13 +1,14 @@
 ﻿using BoardStuff;
+using System;
 
 namespace GameStuff
 {
     public interface Chooser
     {
-        Character ChooseCharacter(string message);
+        void ChooseCharacter(string message, Action<Character> action);
 
-        Cell ChooseCell(string message);
+        void ChooseCell(string message, Action<Cell> action);
 
-        Check ChooseCheck(string message);
+        void ChooseCheck(string message, Action<Check> action);
     }
 }

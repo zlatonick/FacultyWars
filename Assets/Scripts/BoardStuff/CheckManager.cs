@@ -18,8 +18,12 @@ namespace BoardStuff
 
         private Dictionary<int, int> checksQuan;        // level -> quantity
 
+        // Actions
         private Func<Vector2, Cell> cellInThePlace;
+
         private Action<Cell, int> dragFinishedAction;
+
+        private Action<int> checkClickedAction;
 
         void Start()
         {
@@ -30,6 +34,7 @@ namespace BoardStuff
                 redChecks[i].SetChecksCount(1);
                 redChecks[i].gameObject.SetActive(false);
                 redChecks[i].SetDragFinishedAction(OnDragFinished);
+                redChecks[i].SetClickedAction(OnCheckClicked);
             }
 
             for (int i = 0; i < blueChecks.Length; i++)
@@ -39,6 +44,7 @@ namespace BoardStuff
                 blueChecks[i].SetChecksCount(1);
                 blueChecks[i].gameObject.SetActive(false);
                 blueChecks[i].SetDragFinishedAction(OnDragFinished);
+                blueChecks[i].SetClickedAction(OnCheckClicked);
             }
 
             for (int i = 0; i < greenChecks.Length; i++)
@@ -48,6 +54,7 @@ namespace BoardStuff
                 greenChecks[i].SetChecksCount(1);
                 greenChecks[i].gameObject.SetActive(false);
                 greenChecks[i].SetDragFinishedAction(OnDragFinished);
+                greenChecks[i].SetClickedAction(OnCheckClicked);
             }
 
             checksQuan = new Dictionary<int, int>();
@@ -88,6 +95,11 @@ namespace BoardStuff
             this.dragFinishedAction = dragFinishedAction;
         }
 
+        public void SetCheckClickedAction(Action<int> checkClickedAction)
+        {
+            this.checkClickedAction = checkClickedAction;
+        }
+
         private void OnDragFinished(CheckDragHandler check, Vector2 pos)
         {
             Cell cell = cellInThePlace(pos);
@@ -114,6 +126,11 @@ namespace BoardStuff
             {
                 Debug.Log("Wrong cell to spawn a character");
             }
+        }
+
+        public void OnCheckClicked(CheckDragHandler check)
+        {
+            checkClickedAction(check.GetLevel());
         }
 
         // Level: 0 - top, 1 - middle, 2 - bottom

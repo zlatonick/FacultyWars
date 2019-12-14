@@ -1,10 +1,13 @@
 ﻿using MetaInfo;
+using System;
 
 namespace GameStuff
 {
     public class CardFict12 : Card
     {
-        Check chosenCheck;
+        private Check chosenCheck;
+
+        private Action<Card> afterChoosingAction;
 
         public CardFict12()
             : base(12, 50, CardType.SILVER, StuffClass.FICT, true,
@@ -16,9 +19,16 @@ namespace GameStuff
             controller.PlaceCheck(chosenCheck, battle.GetCell());
         }
 
-        public override void Choose(Chooser chooser)
+        public override void Choose(Chooser chooser, Action<Card> afterChoosingAction)
         {
-            chosenCheck = chooser.ChooseCheck("Выберите персонажа из руки");
+            this.afterChoosingAction = afterChoosingAction;
+            chooser.ChooseCheck("Выберите персонажа из руки", AfterCheckWasChosen);
+        }
+
+        public void AfterCheckWasChosen(Check check)
+        {
+            chosenCheck = check;
+            afterChoosingAction(this);
         }
     }
 }

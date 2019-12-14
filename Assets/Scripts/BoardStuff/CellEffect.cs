@@ -74,5 +74,18 @@ namespace BoardStuff
                 return 0;
             }
         }
+
+        public static CellEffect GetInverted(CellEffect cellEffect)
+        {
+            CellEffect newEffect = new CellEffect();
+
+            newEffect.effectsQuan = cellEffect.effectsQuan;
+            newEffect.stuffClass = cellEffect.stuffClass;
+            newEffect.power = -cellEffect.power;
+            newEffect.stuffClass2 = cellEffect.stuffClass2;
+            newEffect.power2 = -cellEffect.power2;
+
+            return newEffect;
+        }
     }
 }

@@ -17,6 +17,6 @@ namespace GameStuff
             }
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

@@ -20,6 +20,6 @@ namespace GameStuff
                 enemyCharacter.GetStartPower() - enemyCharacter.GetPower());
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MetaInfo;
+using System;
 
 namespace GameStuff
 {
@@ -57,7 +58,7 @@ namespace GameStuff
             return isChoosing;
         }
 
-        public abstract void Choose(Chooser chooser);
+        public virtual void Choose(Chooser chooser, Action<Card> afterChoosingAction) {}
 
         public abstract void Act(Battle battle, MatchController controller);
     }

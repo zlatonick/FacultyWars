@@ -21,14 +21,6 @@ namespace GameStuff
 
         void AddCardToHand(Card card);
 
-        void SetCheckPlacedAction(Action<Check, Cell> checkPlacedAction);
-
-        void SetCardPlayedAction(Action<Card> cardPlayedAction);
-
-        void SetCanPlayCardPredicate(Func<CardType> canPlayCardNow);
-
-        void SetActionAfterCardIsPlayed(Action<Card> action);
-
         void SetActionsPermission(bool permission);
 
         void SetAllowedCharacters(bool allowed);

@@ -15,7 +15,7 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
-            List<Character> characters = controller.GetAllCharacters();
+            List<Character> characters = new List<Character>(controller.GetAllCharacters());
             characters.RemoveAll(character => character.GetPlayer() != battle.GetPlayer());
 
             if (characters.Count >= 3)
@@ -31,7 +31,5 @@ namespace GameStuff
                 playerInfo.AddCheckToHand(deadChars[checkIndex]);
             }
         }
-
-        public override void Choose(Chooser chooser) { }
     }
 }

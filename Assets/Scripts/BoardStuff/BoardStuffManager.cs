@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using MetaInfo;
 using UnityEngine.UI;
+using System;
+using System.Collections;
 
 namespace BoardStuff
 {
     public class BoardStuffManager : MonoBehaviour
     {
+        public Canvas canvas;
+
         // Additional classes to store cell and character info
         class CellEffect
         {
@@ -40,9 +44,9 @@ namespace BoardStuff
 
             public bool isBottom;
 
-            public GameObject charPrefab;
+            public CharacterClickHandler charPrefab;
 
-            public CharacterInfo(int id, bool isBottom, GameObject charPrefab)
+            public CharacterInfo(int id, bool isBottom, CharacterClickHandler charPrefab)
             {
                 this.id = id;
                 this.isBottom = isBottom;
@@ -50,11 +54,43 @@ namespace BoardStuff
             }
         }
 
+        class CellCharacters
+        {
+            public List<CharacterInfo> upper;
+
+            public List<CharacterInfo> lower;
+
+            public CellCharacters()
+            {
+                upper = new List<CharacterInfo>();
+                lower = new List<CharacterInfo>();
+            }
+
+            public void AddCharacter(CharacterInfo character, bool toLower)
+            {
+                if (toLower) lower.Add(character);
+                else upper.Add(character);
+            }
+
+            // Returns true if was lower
+            public bool RemoveCharacter(CharacterInfo character)
+            {
+                if (upper.Contains(character))
+                {
+                    upper.Remove(character);
+                    return false;
+                }
+                else
+                {
+                    lower.Remove(character);
+                    return true;
+                }
+            }
+        }
+
         // ---------------- Cells
 
-        public GameObject cellPrefab;
-
-        public Sprite cellSprite;
+        public CellClickHandler cellPrefab;
 
         // Faculty icons game objects
         public GameObject iasaIcon;
@@ -64,7 +100,7 @@ namespace BoardStuff
         public GameObject fpmIcon;
 
         // Created cells
-        private Dictionary<int, GameObject> cells;
+        private Dictionary<int, CellClickHandler> cells;
 
         // Cell effects
         private Dictionary<int, CellEffect> cellEffects;
@@ -75,22 +111,30 @@ namespace BoardStuff
         private float cellWidthClear;
         private float cellOffset;
 
+        // Actions
+        private Action<int> cellClickedAction;
+
+        private Action<int, int> characterClickedAction;        // Takes characterId and cellID
+
         // ---------------- Characters
 
         // Character game objects
-        public GameObject characterRed;
+        public CharacterClickHandler characterRed;
 
-        public GameObject characterBlue;
+        public CharacterClickHandler characterBlue;
 
-        public GameObject characterGreen;
+        public CharacterClickHandler characterGreen;
 
+        public GameObject changePowerText;
+
+        private float characterWidth;
         private float characterOffset;
 
         // Character game objects (holded in structure)
-        private Dictionary<StuffClass, GameObject> charGameObjects;
+        private Dictionary<StuffClass, CharacterClickHandler> charGameObjects;
 
         // Characters on cells
-        private Dictionary<int, List<CharacterInfo>> characters;
+        private Dictionary<int, CellCharacters> characters;
 
         // Inforamtion about characters' cells (charId -> cellId)
         private Dictionary<int, int> charsCells;
@@ -98,27 +142,39 @@ namespace BoardStuff
         void Start()
         {
             // Cells
-            var cellPrefabRect = cellPrefab.GetComponent<RectTransform>();
+            var cellPrefabRect = cellPrefab.gameObject.GetComponent<RectTransform>();
             cellWidth = cellPrefabRect.sizeDelta.x * cellPrefabRect.localScale.x;
             cellHeight = cellPrefabRect.sizeDelta.y * cellPrefabRect.localScale.y;
 
             cellOffset = 49;
             cellWidthClear = cellWidth - cellOffset;
 
-            cells = new Dictionary<int, GameObject>();
+            cells = new Dictionary<int, CellClickHandler>();
             cellEffects = new Dictionary<int, CellEffect>();
 
             // Characters
-            charGameObjects = new Dictionary<StuffClass, GameObject>();
+            charGameObjects = new Dictionary<StuffClass, CharacterClickHandler>();
 
             charGameObjects.Add(StuffClass.IASA, characterRed);
             charGameObjects.Add(StuffClass.FICT, characterBlue);
             charGameObjects.Add(StuffClass.FPM, characterGreen);
 
-            characters = new Dictionary<int, List<CharacterInfo>>();
+            characters = new Dictionary<int, CellCharacters>();
             charsCells = new Dictionary<int, int>();
 
+            var characterRect = characterRed.gameObject.GetComponent<RectTransform>();
+            characterWidth = characterRect.sizeDelta.x * characterRect.localScale.x;
             characterOffset = 23;
+        }
+
+        public void SetCellClickedAction(Action<int> cellClickedAction)
+        {
+            this.cellClickedAction = cellClickedAction;
+        }
+
+        public void SetCharacterClickedAction(Action<int, int> characterClickedAction)
+        {
+            this.characterClickedAction = characterClickedAction;
         }
 
         public void FillBoardWithCells(int pairCellsQuan)
@@ -130,15 +186,23 @@ namespace BoardStuff
                     -cellWidth / 2 + cellWidthClear * (i - 1),
                     -cellHeight / 2);
 
-                GameObject bottomCell = Instantiate(cellPrefab, transform, false);
+                CellClickHandler bottomCell = Instantiate(cellPrefab, transform, false);
                 bottomCell.transform.localPosition = bottomCellPos;
+
+                bottomCell.SetCanvas(canvas);
+                bottomCell.SetClickAction(CellClicked);
+
                 cells.Add(2 * i + 1, bottomCell);
 
                 // Top cell
                 Vector2 topCellPos = new Vector2(bottomCellPos.x + cellOffset + 2, cellHeight / 2);
 
-                GameObject topCell = Instantiate(cellPrefab, transform, false);
+                CellClickHandler topCell = Instantiate(cellPrefab, transform, false);
                 topCell.transform.localPosition = topCellPos;
+
+                topCell.SetCanvas(canvas);
+                topCell.SetClickAction(CellClicked);
+
                 cells.Add(2 * i, topCell);
             }
         }
@@ -167,7 +231,7 @@ namespace BoardStuff
 
         public void SetEffect(int cellId, StuffClass stuffClass, int power)
         {
-            GameObject cell = cells[cellId];
+            CellClickHandler cell = cells[cellId];
             Vector2 cellPos = cell.transform.localPosition;
 
             GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
@@ -185,7 +249,7 @@ namespace BoardStuff
         public void SetEffect(int cellId, StuffClass stuffClass, int power,
             StuffClass stuffClass2, int power2)
         {
-            GameObject cell = cells[cellId];
+            CellClickHandler cell = cells[cellId];
             Vector2 cellPos = cell.transform.localPosition;
 
             GameObject stuffClassIcon = Instantiate(GetIconOfStuffClass(stuffClass),
@@ -211,7 +275,7 @@ namespace BoardStuff
         {
             if (!cellEffects.ContainsKey(cellId)) return;
 
-            GameObject cell = cells[cellId];
+            GameObject cell = cells[cellId].gameObject;
             CellEffect effect = cellEffects[cellId];
 
             if (effect.effectsQuan == 1)
@@ -277,86 +341,224 @@ namespace BoardStuff
 
         private CharacterInfo FindCharacter(int characterId)
         {
-            // Finding the character
-            CharacterInfo character = null;
+            CellCharacters cellCharacters = characters[charsCells[characterId]];
 
-            foreach (CharacterInfo charInfo in characters[charsCells[characterId]])
+            foreach (CharacterInfo charInfo in cellCharacters.upper)
             {
                 if (charInfo.id == characterId)
                 {
-                    character = charInfo;
-                    break;
+                    return charInfo;
+                }
+            }
+            foreach (CharacterInfo charInfo in cellCharacters.lower)
+            {
+                if (charInfo.id == characterId)
+                {
+                    return charInfo;
                 }
             }
 
-            return character;
+            return null;
         }
 
-        private Vector2 GetCharacterCoords(int cellId, bool toBottom)
+        // From left to right
+        private List<Vector2> GetCharactersCoords(int cellId, bool toBottom, int charsQuan)
         {
+            List<Vector2> result = new List<Vector2>();
+
             Vector2 cellCoords = cells[cellId].transform.localPosition;
 
-            Vector2 charCoords;
+            float charWidthClear = characterWidth - characterOffset;
+            float initialPosX = cellCoords.x - (cellWidth / 2)
+                + (charWidthClear / 2) - (characterOffset / 2);
+            float charCoordY = cellCoords.y;
+
             if (toBottom)
             {
-                charCoords = new Vector2(cellCoords.x - cellOffset / 4 - characterOffset / 2,
-                    cellCoords.y - cellHeight / 4);
+                initialPosX += cellOffset / 4;
+                charCoordY -= cellHeight / 4;
             }
             else
             {
-                charCoords = new Vector2(cellCoords.x + cellOffset / 4 - characterOffset / 2,
-                    cellCoords.y + cellHeight / 4);
+                initialPosX += cellOffset * 3 / 4;
+                charCoordY += cellHeight / 4;
             }
 
-            return charCoords;
+            if (charsQuan == 1)
+            {
+                Vector2 charCoords;
+                if (toBottom)
+                {
+                    charCoords = new Vector2(cellCoords.x - cellOffset / 4 - characterOffset / 2,
+                        cellCoords.y - cellHeight / 4);
+                }
+                else
+                {
+                    charCoords = new Vector2(cellCoords.x + cellOffset / 4 - characterOffset / 2,
+                        cellCoords.y + cellHeight / 4);
+                }
+
+                result.Add(charCoords);
+                /*float charsDist = (cellWidthClear - totalCharsWidth) / (charsQuan + 1);
+                initialPosX += charsDist;
+
+                for (int i = 0; i < charsQuan; i++)
+                {
+                    float charCoordX = initialPosX + i * (charsDist + characterWidth - characterOffset);
+                    Debug.Log("charCoordX: " + charCoordX);
+                    result.Add(new Vector2(charCoordX, charCoordY));
+                }*/
+            }
+            else
+            {
+                float margin = cellWidthClear / 10;
+
+                float charsDist = (cellWidthClear - 2 * margin - charWidthClear) / (charsQuan - 1);
+                initialPosX += margin;
+
+                for (int i = 0; i < charsQuan; i++)
+                {
+                    float charCoordX = initialPosX + i * charsDist;
+                    result.Add(new Vector2(charCoordX, charCoordY));
+                }
+            }
+
+            return result;
         }
 
-        // TODO: Add more than 2 characters on cell support
+        private void NormalizeCharacterPositions(int cellId, bool isBottom)
+        {
+            List<CharacterInfo> charactersLine = isBottom ?
+                characters[cellId].lower : characters[cellId].upper;
+
+            if (charactersLine.Count > 0)
+            {
+                List<Vector2> charsCoords = GetCharactersCoords(cellId, isBottom, charactersLine.Count);
+
+                for (int i = 0; i < charactersLine.Count; i++)
+                {
+                    CharacterClickHandler charPrefab = charactersLine[i].charPrefab;
+                    charPrefab.transform.localPosition = charsCoords[i];
+                }
+            }
+        }
+
         public void SpawnCharacter(int cellId, int characterId, StuffClass stuffClass,
             int power, bool toBottom)
         {
-            // Calculating the coordinates of character
-            Vector2 charCoords = GetCharacterCoords(cellId, toBottom);
-
             // Spawning the character
-            GameObject charPrefab = Instantiate(
+            CharacterClickHandler newCharPrefab = Instantiate(
                 charGameObjects[stuffClass], transform, false);
-            charPrefab.transform.localPosition = charCoords;
+            newCharPrefab.SetCanvas(canvas);
+            newCharPrefab.SetClickAction(CharacterClicked);
 
-            // Setting the power
-            Text powerText = charPrefab.GetComponentInChildren<Text>();
-            powerText.text = "" + power;
-
-            CharacterInfo charInfo = new CharacterInfo(characterId, toBottom, charPrefab);
-
-            // Adding character to the board info
+            // Quantity of characters in the line
             if (!characters.ContainsKey(cellId))
             {
-                characters.Add(cellId, new List<CharacterInfo>());
+                characters.Add(cellId, new CellCharacters());
             }
 
-            characters[cellId].Add(charInfo);
+            // Setting the power
+            Text powerText = newCharPrefab.GetComponentInChildren<Text>();
+            powerText.text = "" + power;
 
+            CharacterInfo charInfo = new CharacterInfo(characterId, toBottom, newCharPrefab);
+
+            // Adding character to the board info
+            characters[cellId].AddCharacter(charInfo, toBottom);
             charsCells.Add(characterId, cellId);
+
+            // Normalizing the positions
+            NormalizeCharacterPositions(cellId, toBottom);
         }
 
-        // TODO: Add more than 2 characters on cell support
         public void RemoveCharacter(int characterId)
         {
             CharacterInfo character = FindCharacter(characterId);
 
             // Destroying the character
-            Destroy(character.charPrefab);
+            Destroy(character.charPrefab.gameObject);
 
-            // Removing character from structure
-            characters[charsCells[characterId]].Remove(character);
+            // Removing character from structures
+            int cellId = charsCells[characterId];
+            bool wasBottom = characters[cellId].RemoveCharacter(character);
+            charsCells.Remove(characterId);
+
+            // Recalculating the positions of the rest
+            NormalizeCharacterPositions(cellId, wasBottom);
         }
 
-        public void ChangeCharacterPower(int characterId, int newPower)
+        public void MoveCharacterToCell(int characterId, int newCellId)
+        {
+            CharacterInfo character = FindCharacter(characterId);
+            int oldCellId = charsCells[characterId];
+
+            // Removing from the old cell
+            bool wasBottom = characters[oldCellId].RemoveCharacter(character);
+            NormalizeCharacterPositions(oldCellId, wasBottom);
+
+            // Adding to the new cell
+            characters[newCellId].AddCharacter(character, wasBottom);
+            NormalizeCharacterPositions(newCellId, wasBottom);
+
+            charsCells[characterId] = newCellId;
+        }
+
+        public void ChangeCharacterPower(int characterId, int newPower, int changeBy)
         {
             CharacterInfo character = FindCharacter(characterId);
             Text powerText = character.charPrefab.GetComponentInChildren<Text>();
             powerText.text = "" + newPower;
+
+            // Playing the animation
+            if (changeBy != 0)
+            {
+                GameObject powerTextInst = Instantiate(changePowerText,
+                    character.charPrefab.transform, false);
+                powerTextInst.transform.localPosition = new Vector2(0, 0);
+                powerTextInst.transform.localScale = new Vector2(4, 4);
+
+                Text text = powerTextInst.GetComponent<Text>();
+                text.text = changeBy > 0 ? "+" : "";
+                text.text += changeBy;
+
+                Animator animator = powerTextInst.GetComponent<Animator>();
+                animator.SetInteger("PowerChanged", 1);
+
+                StartCoroutine(DeletePowerText(powerTextInst));
+            }
+        }
+
+        private IEnumerator DeletePowerText(GameObject powerText)
+        {
+            yield return new WaitForSeconds(3);
+            Destroy(powerText);
+        }
+
+        public void CellClicked(Vector2 pos)
+        {
+            int cellId = GetCellIdByCoords(pos);
+            cellClickedAction(cellId);
+        }
+
+        public void CharacterClicked(CharacterClickHandler characterClickHandler, Vector2 pos)
+        {
+            int cellId = GetCellIdByCoords(pos);
+
+            foreach (CharacterInfo info in characters[cellId].upper)
+            {
+                if (info.charPrefab == characterClickHandler)
+                {
+                    characterClickedAction(info.id, cellId);
+                }
+            }
+            foreach (CharacterInfo info in characters[cellId].lower)
+            {
+                if (info.charPrefab == characterClickHandler)
+                {
+                    characterClickedAction(info.id, cellId);
+                }
+            }
         }
     }
 }

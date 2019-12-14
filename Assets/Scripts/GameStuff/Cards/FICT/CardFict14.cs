@@ -21,7 +21,5 @@ namespace GameStuff
             controller.ChangePowerSafe(character, enemyPower - myPower);
             controller.ChangePowerSafe(enemy, myPower - enemyPower);
         }
-
-        public override void Choose(Chooser chooser) { }
     }
 }

@@ -40,9 +40,9 @@ namespace BoardStuff
 
             RectTransform cardPanelRect = GetComponent<RectTransform>();
             cardPanelWidth = cardPanelRect.rect.xMax - cardPanelRect.rect.xMin;
-            cardPanelWidth = cardPanelRect.rect.yMax - cardPanelRect.rect.yMin;
+            cardPanelHeight = cardPanelRect.rect.yMax - cardPanelRect.rect.yMin;
 
-            cardsDistance = cardPanelWidth / 20;
+            cardsDistance = cardPanelWidth / 40;
         }
 
         public void SetCardPlayedAction(Action<int> cardPlayedAction)
@@ -59,26 +59,40 @@ namespace BoardStuff
         {
             int cardsQuan = cardInstances.Count;
 
-            if (cardsQuan * (cardWidth + cardsDistance) > cardPanelWidth)
+            float totalCardsWidth = cardsQuan * (cardWidth + cardsDistance) - cardsDistance;
+
+            if (totalCardsWidth < cardPanelWidth)
             {
-                cardsDistance = cardPanelWidth / cardsQuan - cardWidth;
+                float margin = (cardPanelWidth - totalCardsWidth) / 2;
+
+                int cardIndex = 0;
+                foreach (var card in cardInstances)
+                {
+                    float coordX = margin + cardIndex * (cardWidth + cardsDistance);
+                    card.Value.transform.localPosition = new Vector2(coordX, 0);
+
+                    cardIndex++;
+                }
             }
             else
             {
-                cardsDistance = cardPanelWidth / 20;
-            }
+                float cardsInnerDist = (cardPanelWidth - cardWidth) / (cardsQuan - 1);
 
-            for (int i = 0; i < cardsQuan; i++)
-            {
-                cardInstances[i].transform.localPosition = new Vector2(
-                    i * (cardWidth + cardsDistance), 0);
+                int cardIndex = 0;
+                foreach (var card in cardInstances)
+                {
+                    float coordX = cardIndex * cardsInnerDist;
+                    card.Value.transform.localPosition = new Vector2(coordX, 0);
+
+                    cardIndex++;
+                }
             }
         }
 
-        public int AddCard(StuffClass stuffClass, CardType cardType, string text)
+        public GameObject GetCardGameObject(StuffClass stuffClass, CardType cardType)
         {
             // Creating the card
-            CardClickHandler cardSource = null;
+            GameObject cardSource = null;
 
             // No_battle texture = neutral
             if (cardType == CardType.NO_BATTLE)
@@ -86,11 +100,17 @@ namespace BoardStuff
                 cardType = CardType.NEUTRAL;
             }
 
-            if (stuffClass == StuffClass.IASA) cardSource = iasaCards[(int)cardType];
-            else if (stuffClass == StuffClass.FICT) cardSource = fictCards[(int)cardType];
-            else if (stuffClass == StuffClass.FPM) cardSource = fpmCards[(int)cardType];
+            if (stuffClass == StuffClass.IASA) cardSource = iasaCards[(int)cardType].gameObject;
+            else if (stuffClass == StuffClass.FICT) cardSource = fictCards[(int)cardType].gameObject;
+            else if (stuffClass == StuffClass.FPM) cardSource = fpmCards[(int)cardType].gameObject;
 
-            GameObject newInst = Instantiate(cardSource.gameObject, transform, false);
+            return cardSource;
+        }
+
+        public int AddCard(StuffClass stuffClass, CardType cardType, string text)
+        {
+            GameObject cardSource = GetCardGameObject(stuffClass, cardType);
+            GameObject newInst = Instantiate(cardSource, transform, false);
 
             // Setting the parameters
             CardClickHandler card = newInst.GetComponent<CardClickHandler>();
@@ -107,17 +127,7 @@ namespace BoardStuff
             lastCardId++;
 
             // Fixing the positions
-            int cardsQuan = cardInstances.Count;
-
-            if (cardsQuan * (cardWidth + cardsDistance) > cardPanelWidth)
-            {
-                FixCardsPositions();
-            }
-            else
-            {
-                newInst.transform.localPosition = new Vector2(
-                    (cardsQuan - 1) * (cardWidth + cardsDistance), 0);
-            }
+            FixCardsPositions();
 
             return lastCardId - 1;
         }

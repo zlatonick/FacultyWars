@@ -25,6 +25,8 @@ namespace GameStuff
 
         bool IsBattleNow();
 
+        void DontCloseCellAfterBattle(bool dontClose);
+
         void FinishMove();
 
         void PlayCard(Card card);
@@ -36,6 +38,8 @@ namespace GameStuff
         void SetAfterBattleAction(Action<Player> action);
 
         void SetAfterNTurnsAction(int n, Action action);
+
+        void SetActionAfterCardIsPlayed(Player player, Action<Card> action);
 
         void FinishBattle(Player winner);
 

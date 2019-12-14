@@ -16,7 +16,7 @@ namespace GameStuff
         {
             PlayerInfo playerInfo = controller.GetPlayerInfo(battle.GetPlayer());
 
-            playerInfo.SetActionAfterCardIsPlayed(card =>
+            controller.SetActionAfterCardIsPlayed(battle.GetPlayer(), card =>
             {
                 if (card.GetCardType() == CardType.SILVER)
                 {
@@ -30,6 +30,6 @@ namespace GameStuff
             });
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

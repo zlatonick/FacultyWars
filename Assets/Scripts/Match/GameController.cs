@@ -14,7 +14,11 @@ namespace Match
 
         public CheckManager checkManager;
 
+        public CardsDemonstrator cardsDemonstrator;
+
         public BoardStuffManager boardStuffManager;
+
+        public ChooserImpl chooser;
 
         private Board board;
 
@@ -24,14 +28,14 @@ namespace Match
 
         private Player opponent;
 
-        private PlayerInfo playerInfo;
+        private PlayerController playerInfo;
 
         private Engine engine;
 
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            /*StuffPack.stuffClass = StuffClass.IASA;            
+            /*StuffPack.stuffClass = StuffClass.FPM;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
@@ -40,35 +44,23 @@ namespace Match
 
             StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
             StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 2));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 4));
 
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));*/
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));*/
 
-            board = new BoardController(boardStuffManager, 4);
+            board = new BoardController(boardStuffManager, 4,
+                chooser.CellClicked, chooser.CharacterClicked);
 
             checkManager.SetCellInThePlacePredicate(board.GetCellByCoords);
 
             // Setting up the checks
-            Dictionary<int, Check> checkLevels = new Dictionary<int, Check>();
-
-            foreach (Check check in StuffPack.checks)
-            {
-                if (!checkLevels.ContainsKey(check.GetLevel()))
-                {
-                    checkLevels.Add(check.GetLevel(), check);
-                }
-            }
+            Dictionary<int, Check> checkLevels = CheckLevels.GetCheckLevels(StuffPack.stuffClass);
 
             // Setting up the player
             player = new Player(0, StuffPack.stuffClass);
@@ -85,14 +77,17 @@ namespace Match
             }
 
             // Setting up the opponent (AI)
-            engine = EngineCreator.CreateEngine(StuffClass.FICT);
+            engine = EngineCreator.CreateEngine();      // IASA by default
             opponent = new Player(1, engine.GetStuffClass());
 
             // Setting up the match controller
-            matchController = new MatchControllerImpl(board,
+            matchController = new MatchControllerImpl(board, chooser, cardsDemonstrator,
                 player, playerInfo, opponent, engine.GetPlayerInfo());
 
+            engine.SetMatchController(matchController);
+
             playerInfo.SetCheckPlacedAction(CheckPlaced);
+            playerInfo.SetCheckClickedAction(chooser.CheckClicked);
             playerInfo.SetCardPlayedAction(CardPlayed);
             playerInfo.SetCanPlayCardPredicate(matchController.GetAllowedCardTypes);
 
@@ -140,7 +135,7 @@ namespace Match
             else
             {
                 // TODO: Add non-battle card moves
-                PlayerMove move = engine.MakeMove(matchController);
+                PlayerMove move = engine.MakeMove();
 
                 if (move != null)
                 {

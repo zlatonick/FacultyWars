@@ -1,23 +1,25 @@
-﻿using MetaInfo;
-using System.Collections.Generic;
+﻿using BoardStuff;
+using MetaInfo;
 
 namespace GameStuff
 {
     public class CardIasa9 : Card
     {
         public CardIasa9()
-            : base(0, 60, CardType.SILVER, StuffClass.IASA, false,
-                  "Вы получаете +20 к силе за каждый выигранный в матче бой")
+            : base(9, 50, CardType.SILVER, StuffClass.IASA, false,
+                  "Если уровень силы вашего персонажа меньше первоначального, он получает +30 к силе")
         { }
 
         public override void Act(Battle battle, MatchController controller)
         {
-            List<int> battles = controller.GetPlayerInfo(battle.GetPlayer()).GetBattlesHistory();
-            battles.RemoveAll(res => res != 1);
+            Character character = battle.GetCharacter();
 
-            controller.ChangePowerSafe(battle.GetCharacter(), battles.Count * 20);
+            if (character.GetPower() < character.GetStartPower())
+            {
+                controller.ChangePowerSafe(character, 30);
+            }
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }

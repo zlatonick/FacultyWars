@@ -6,19 +6,20 @@ namespace GameStuff
     public class CardIasa8 : Card
     {
         public CardIasa8()
-            : base(8, 50, CardType.SILVER, StuffClass.IASA, false,
-                  "Если уровень силы вашего персонажа меньше первоначального, он получает +30 к силе") { }
+            : base(8, 90, CardType.GOLD, StuffClass.IASA, false,
+                  "Вы получаете бонус к силе, равный количеству силы, " +
+                  "полученной вашим противником в этом бою ") { }
 
         public override void Act(Battle battle, MatchController controller)
         {
             Character character = battle.GetCharacter();
+            Character opponent = battle.GetEnemyCharacter();
 
-            if (character.GetPower() < character.GetStartPower())
-            {
-                controller.ChangePowerSafe(character, 30);
-            }
+            int changeBy = opponent.GetPower() - opponent.GetStartPower();
+
+            controller.ChangePowerSafe(character, changeBy);
         }
 
-        public override void Choose(Chooser chooser) { }
+        
     }
 }
