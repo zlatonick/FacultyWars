@@ -49,8 +49,6 @@ namespace Preparing.list_items
                     cardImage.sprite = sprites[2];
                     break;
             }
-
-            GetComponent<Image>().sprite = sprites[0];
         }
 
         public void HandleClick()
