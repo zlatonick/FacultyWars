@@ -25,6 +25,10 @@ namespace GameStuff
 
         bool IsBattleNow();
 
+        bool CanPlaceCheckThere(Cell cell);
+
+        List<Cell> GetAllPlacableCells();
+
         void DontCloseCellAfterBattle(bool dontClose);
 
         void FinishMove();

@@ -52,12 +52,16 @@ namespace Match
 
         CardsDemonstrator cardsDemonstrator;
 
+        Action<Player> gameOverAction;
+
         public MatchControllerImpl(Board board, Chooser chooser, CardsDemonstrator cardsDemonstrator,
-            Player player1, PlayerInfo playerInfo1, Player player2, PlayerInfo playerInfo2)
+            Player player1, PlayerInfo playerInfo1, Player player2,
+            PlayerInfo playerInfo2, Action<Player> gameOverAction)
         {
             this.board = board;
             this.chooser = chooser;
             this.cardsDemonstrator = cardsDemonstrator;
+            this.gameOverAction = gameOverAction;
 
             // Setting the players info
             playersInfo = new Dictionary<Player, PlayerInfo>();
@@ -207,7 +211,7 @@ namespace Match
             // Executing the action, if needed
             if (afterNTurnsActions.Count > 0)
             {
-                var keys = afterNTurnsActions.Keys;
+                List<Action> keys = new List<Action>(afterNTurnsActions.Keys);
                 foreach (var key in keys)
                 {
                     afterNTurnsActions[key]--;
@@ -232,7 +236,38 @@ namespace Match
             else
             {
                 character.ChangePower(-currPower);
-                board.DestroyCharacter(character);
+
+                Player charPlayer = character.GetPlayer();
+
+                // Checking if the battle is finished
+                if (isBattleNow)
+                {
+                    Cell cell = board.GetCharacterCell(character);
+                    List<Character> characters = board.GetCharactersOnCell(cell);
+
+                    List<Character> friendly = new List<Character>(characters);
+                    friendly.RemoveAll(ch => ch.GetPlayer() != charPlayer);
+
+                    if (friendly.Count == 1)
+                    {
+                        FinishBattle(charPlayer == currPlayer ? currOpponent : currPlayer);
+                    }
+                    else
+                    {
+                        board.DestroyCharacter(character);
+                        playersInfo[charPlayer].AddCheckToDead(checkFactory.GetCheck(
+                            character.GetStuffClass(), character.GetLevel()));
+
+                        battles[charPlayer].RemoveAll(battle => battle.GetPlayer() == charPlayer
+                            || battle.GetEnemyPlayer() == charPlayer);
+                    }
+                }
+                else
+                {
+                    board.DestroyCharacter(character);
+                    playersInfo[charPlayer].AddCheckToDead(checkFactory.GetCheck(
+                        character.GetStuffClass(), character.GetLevel()));
+                }
             }
         }
 
@@ -249,8 +284,6 @@ namespace Match
             }
 
             CheckBattlesWithNewCharacter(newCharacter, cell);
-
-            ChangeMove();
         }
 
         private void CheckBattlesWithNewCharacter(Character newCharacter, Cell cell)
@@ -475,6 +508,13 @@ namespace Match
             // Removing the after card is played actions
             afterCardIsPlayedActions[currPlayer] = null;
             afterCardIsPlayedActions[currOpponent] = null;
+
+            // Checking if the match is over
+            Player matchWinner = MatchIsFinished();
+            if (matchWinner != null)
+            {
+                gameOverAction(matchWinner);
+            }
         }
 
         private void StopBattle()
@@ -511,7 +551,8 @@ namespace Match
 
             if (isBattleNow)
             {
-                foreach (Battle battle in battles[currPlayer])
+                List<Battle> battlesCopy = new List<Battle>(battles[currPlayer]);   // Some new battles can appear
+                foreach (Battle battle in battlesCopy)
                 {
                     card.Act(battle, this);
                 }
@@ -532,8 +573,6 @@ namespace Match
                 {
                     battleStatuses[currPlayer] = BattleStatus.TWO_CARDS_PLAYED;
                 }
-
-                ChangeMove();
             }
             else
             {
@@ -700,6 +739,76 @@ namespace Match
         public bool AreCharactersAllowed()
         {
             return !isBattleNow;
+        }
+
+        public bool CanPlaceCheckThere(Cell cell)
+        {
+            // Checking if the cell is not blocked
+            if (cell.IsBlocked()) return false;
+
+            // Checking if there are already some player's characters on the cell
+            List<Character> characters = board.GetCharactersOnCell(cell);            
+            foreach (Character character in characters)
+            {
+                if (character.GetPlayer() == currPlayer)
+                {
+                    return false;
+                }
+            }
+
+            // Checking if the player has only one check
+            // Checking if the opponent has no more checks
+            PlayerInfo playerInfo = playersInfo[currPlayer];
+            PlayerInfo opponentInfo = playersInfo[currOpponent];
+
+            if (playerInfo.GetChecksCount() == 1 ||
+                opponentInfo.GetChecksCount() == 0)
+            {
+                // Checking if there are at least one enemy character on the board
+                List<Character> allCharacters = new List<Character>(board.GetAllCharacters());
+                allCharacters.RemoveAll(character => character.GetPlayer() != currOpponent);
+
+                if (allCharacters.Count > 0)
+                {
+                    // Can place only on the cell with enemy character
+                    foreach (Character character in allCharacters)
+                    {
+                        if (board.GetCharacterCell(character) == cell)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public List<Cell> GetAllPlacableCells()
+        {
+            List<Cell> result = new List<Cell>();
+
+            foreach (Cell cell in board.GetAllCells())
+            {
+                if (CanPlaceCheckThere(cell))
+                {
+                    result.Add(cell);
+                }
+            }
+
+            return result;
+        }
+
+        private Player MatchIsFinished()
+        {
+            PlayerInfo playerInfo = playersInfo[currPlayer];
+            PlayerInfo opponentInfo = playersInfo[currOpponent];
+
+            if (playerInfo.GetChecksCount() == 0) return currOpponent;
+            if (opponentInfo.GetChecksCount() == 0) return currPlayer;
+
+            return null;
         }
     }
 }

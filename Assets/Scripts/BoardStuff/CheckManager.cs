@@ -21,9 +21,15 @@ namespace BoardStuff
         // Actions
         private Func<Vector2, Cell> cellInThePlace;
 
+        private Predicate<Cell> canPlaceCheckThere;
+
         private Action<Cell, int> dragFinishedAction;
 
         private Action<int> checkClickedAction;
+
+        private Func<List<Cell>> getPlacableCells;
+        private Action<List<Cell>> highlightPlacableCells;
+        private Action unhighlightCells;
 
         void Start()
         {
@@ -33,6 +39,7 @@ namespace BoardStuff
                 redChecks[i].SetCanvas(canvas);
                 redChecks[i].SetChecksCount(1);
                 redChecks[i].gameObject.SetActive(false);
+                redChecks[i].SetDragStartedAction(OnDragStarted);
                 redChecks[i].SetDragFinishedAction(OnDragFinished);
                 redChecks[i].SetClickedAction(OnCheckClicked);
             }
@@ -43,6 +50,7 @@ namespace BoardStuff
                 blueChecks[i].SetCanvas(canvas);
                 blueChecks[i].SetChecksCount(1);
                 blueChecks[i].gameObject.SetActive(false);
+                blueChecks[i].SetDragStartedAction(OnDragStarted);
                 blueChecks[i].SetDragFinishedAction(OnDragFinished);
                 blueChecks[i].SetClickedAction(OnCheckClicked);
             }
@@ -53,6 +61,7 @@ namespace BoardStuff
                 greenChecks[i].SetCanvas(canvas);
                 greenChecks[i].SetChecksCount(1);
                 greenChecks[i].gameObject.SetActive(false);
+                greenChecks[i].SetDragStartedAction(OnDragStarted);
                 greenChecks[i].SetDragFinishedAction(OnDragFinished);
                 greenChecks[i].SetClickedAction(OnCheckClicked);
             }
@@ -68,8 +77,8 @@ namespace BoardStuff
         public void SetStuffClass(StuffClass stuffClass, Dictionary<int, int> powers)
         {
             if (stuffClass == StuffClass.IASA) currChecks = redChecks;
-            else if (stuffClass == StuffClass.FICT) currChecks = blueChecks;
-            else if (stuffClass == StuffClass.FPM) currChecks = greenChecks;
+            else if (stuffClass == StuffClass.FICT) currChecks = greenChecks;
+            else if (stuffClass == StuffClass.FPM) currChecks = blueChecks;
 
             foreach (var pr in powers)
             {
@@ -90,6 +99,11 @@ namespace BoardStuff
             this.cellInThePlace = cellInThePlace;
         }
 
+        public void SetCanPlaceCheckThere(Predicate<Cell> canPlaceCheckThere)
+        {
+            this.canPlaceCheckThere = canPlaceCheckThere;
+        }
+
         public void SetDragFinishedAction(Action<Cell, int> dragFinishedAction)
         {
             this.dragFinishedAction = dragFinishedAction;
@@ -100,25 +114,32 @@ namespace BoardStuff
             this.checkClickedAction = checkClickedAction;
         }
 
+        public void SetPlacableCellsFunctions(Func<List<Cell>> getPlacableCells,
+            Action<List<Cell>> highlightPlacableCells, Action unhighlightCells)
+        {
+            this.getPlacableCells = getPlacableCells;
+            this.highlightPlacableCells = highlightPlacableCells;
+            this.unhighlightCells = unhighlightCells;
+        }
+
+        private void OnDragStarted()
+        {
+            highlightPlacableCells(getPlacableCells());
+        }
+
         private void OnDragFinished(CheckDragHandler check, Vector2 pos)
         {
+            // Unhighlight the cells
+            unhighlightCells();
+
             Cell cell = cellInThePlace(pos);
 
             int checkLevel = check.GetLevel();
 
-            if (cell != null)
+            if (cell != null && canPlaceCheckThere(cell))
             {
                 // Removing the check
-                if (checksQuan[checkLevel] > 1)
-                {
-                    checksQuan[checkLevel]--;
-                    check.SetChecksCount(checksQuan[checkLevel]);
-                }
-                else
-                {
-                    checksQuan[checkLevel]--;
-                    check.gameObject.SetActive(false);
-                }
+                RemoveCheck(checkLevel);
 
                 dragFinishedAction(cell, checkLevel);
             }
@@ -148,6 +169,22 @@ namespace BoardStuff
             {
                 checksQuan[level]++;
                 currCheck.SetChecksCount(checksQuan[level]);
+            }
+        }
+
+        public void RemoveCheck(int checkLevel)
+        {
+            CheckDragHandler check = currChecks[checkLevel];
+
+            if (checksQuan[checkLevel] > 1)
+            {
+                checksQuan[checkLevel]--;
+                check.SetChecksCount(checksQuan[checkLevel]);
+            }
+            else
+            {
+                checksQuan[checkLevel]--;
+                check.gameObject.SetActive(false);
             }
         }
     }

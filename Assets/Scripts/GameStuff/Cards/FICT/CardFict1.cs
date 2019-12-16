@@ -39,7 +39,6 @@ namespace GameStuff
         {
             this.chosenCharLose = chosenCharLose;
             chooser.ChooseCharacter("Выберите персонажа, к которому перейдет сила", AfterBothWereChosen);
-
         }
 
         public void AfterBothWereChosen(Character chosenCharIncrease)

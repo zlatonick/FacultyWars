@@ -9,6 +9,8 @@ namespace BoardStuff
     {
         private Canvas canvas;
 
+        private RectTransform rect;
+
         private GameObject biggerPrefab;
 
         private GameObject dragPrefab;
@@ -17,47 +19,42 @@ namespace BoardStuff
 
         private float smallCardWidth;
 
+        private float bigCardWidth;
+        private float bigCardHeight;
+
         private bool isDraggingNow;
         private bool canEnlarge;
 
         private Action<int> cardPlayedAction;
         private Func<int, bool> canDragNow;
 
-        void Start()
+        public void InitCard()
         {
-            RectTransform rect = GetComponent<RectTransform>();
+            rect = GetComponent<RectTransform>();
 
             smallCardWidth = rect.sizeDelta.x * rect.localScale.x;
 
             Vector2 biggerScale = new Vector2(rect.localScale.x * 4, rect.localScale.y * 4);
 
-            float bigCardWidth = rect.sizeDelta.x * biggerScale.x;
-            float bigCardHeight = rect.sizeDelta.y * biggerScale.y;
+            bigCardWidth = rect.sizeDelta.x * biggerScale.x;
+            bigCardHeight = rect.sizeDelta.y * biggerScale.y;
 
             Vector2 biggerPos = new Vector2(
                 rect.transform.localPosition.x - bigCardWidth / 2.5f,
                 rect.transform.localPosition.y + bigCardHeight / 1.5f);
 
             isDraggingNow = false;
+            
+            biggerPrefab = Instantiate(gameObject, transform.parent, false);
 
-            if (gameObject.name == "Dragging")
-            {
-                canEnlarge = false;
-            }
-            else
-            {
-                // Creating the prefab with big view
-                biggerPrefab = Instantiate(gameObject, transform.parent, false);
+            // Removing the script component
+            Destroy(biggerPrefab.GetComponent<CardClickHandler>());
 
-                // Removing the script component
-                Destroy(biggerPrefab.GetComponent<CardClickHandler>());
+            biggerPrefab.transform.localScale = biggerScale;
+            biggerPrefab.transform.localPosition = biggerPos;
+            biggerPrefab.SetActive(false);
 
-                biggerPrefab.transform.localScale = biggerScale;
-                biggerPrefab.transform.localPosition = biggerPos;
-                biggerPrefab.SetActive(false);
-
-                canEnlarge = true;
-            }
+            canEnlarge = true;
         }
 
         public void SetCanvas(Canvas canvas)
@@ -99,6 +96,15 @@ namespace BoardStuff
             {
                 biggerPrefab.SetActive(false);
             }
+        }
+
+        public void FixBigPrefabPosition()
+        {
+            Vector2 biggerPos = new Vector2(
+                rect.transform.localPosition.x - bigCardWidth / 2.5f,
+                rect.transform.localPosition.y + bigCardHeight / 1.5f);
+
+            biggerPrefab.transform.localPosition = biggerPos;
         }
 
         void OnDestroy()

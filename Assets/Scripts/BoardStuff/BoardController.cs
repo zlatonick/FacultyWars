@@ -111,6 +111,23 @@ namespace BoardStuff
             cellsCharacters.Remove(cell);
         }
 
+        public void HighlightCells(List<Cell> cells)
+        {
+            List<int> indexes = new List<int>();
+
+            foreach (Cell cell in cells)
+            {
+                indexes.Add(cell.GetId());
+            }
+
+            boardStuffManager.HighlightPlacableCells(indexes);
+        }
+
+        public void UnhighlightCells()
+        {
+            boardStuffManager.UnhighlightCells();
+        }
+
         public Character SpawnCharacter(StuffClass stuffClass, int level, int power, Player player, Cell cell)
         {
             Character character = characterFactory.CreateCharacter(stuffClass, level, power, player);
@@ -158,9 +175,6 @@ namespace BoardStuff
             if (cellId == -1) return null;
             Cell cell = cells[cellId];
 
-            // Checking if the cell is not blocked
-            if (cell.IsBlocked()) return null;
-
             return cell;
         }
 
@@ -182,6 +196,7 @@ namespace BoardStuff
                 if (character.GetId() == characterId)
                 {
                     characterClickedAction(character);
+                    break;
                 }
             }
         }

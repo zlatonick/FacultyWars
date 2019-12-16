@@ -3,6 +3,7 @@ using GameStuff;
 using MetaInfo;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace GameEngine
 {
@@ -18,9 +19,7 @@ namespace GameEngine
 
         private EnginePlayerController playerInfo;
 
-        private Random random;
-
-        private List<int> availableCells;
+        private System.Random random;
 
         public EngineImpl(StuffClass stuffClass, Dictionary<int, Check> checkLevels)
         {
@@ -29,17 +28,24 @@ namespace GameEngine
 
             // Determined start pack
             cardFactory = new CardFactoryImpl();
-            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 0));
-            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 0));
-            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 1));
 
             checkFactory = new CheckFactoryImpl();
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 0));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
             playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
 
             // Some settings
-            random = new Random();
-            availableCells = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 };
+            random = new System.Random();
         }
 
         public void SetMatchController(MatchController controller)
@@ -74,6 +80,11 @@ namespace GameEngine
 
         public PlayerMove MakeMove()
         {
+            // Choosing the cell
+            List<Cell> availableCells = controller.GetAllPlacableCells();
+            Cell cell = availableCells[random.Next(availableCells.Count)];
+
+            // Choosing the check
             Dictionary<int, int> checks = playerInfo.GetChecksInHand();
             Check check = null;
             
@@ -88,11 +99,6 @@ namespace GameEngine
             }
 
             if (check == null) return null;
-
-            int cellId = availableCells[random.Next(availableCells.Count)];
-            availableCells.Remove(cellId);
-
-            Cell cell = controller.GetCellById(cellId);
 
             return new PlayerMove(check, cell);
         }

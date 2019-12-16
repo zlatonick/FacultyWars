@@ -15,7 +15,7 @@ namespace BoardStuff
         public CardClickHandler[] fictCards;
         public CardClickHandler[] fpmCards;
 
-        private Dictionary<int, GameObject> cardInstances;
+        private Dictionary<int, CardClickHandler> cardInstances;
 
         // Some metrical characteristics
         private int lastCardId;
@@ -31,7 +31,7 @@ namespace BoardStuff
 
         void Start()
         {
-            cardInstances = new Dictionary<int, GameObject>();
+            cardInstances = new Dictionary<int, CardClickHandler>();
             lastCardId = 0;
 
             // Calculating some metrics
@@ -70,6 +70,7 @@ namespace BoardStuff
                 {
                     float coordX = margin + cardIndex * (cardWidth + cardsDistance);
                     card.Value.transform.localPosition = new Vector2(coordX, 0);
+                    card.Value.FixBigPrefabPosition();
 
                     cardIndex++;
                 }
@@ -83,6 +84,7 @@ namespace BoardStuff
                 {
                     float coordX = cardIndex * cardsInnerDist;
                     card.Value.transform.localPosition = new Vector2(coordX, 0);
+                    card.Value.FixBigPrefabPosition();
 
                     cardIndex++;
                 }
@@ -122,8 +124,10 @@ namespace BoardStuff
             var cardText = newInst.GetComponentInChildren<Text>();
             cardText.text = text;
 
+            card.InitCard();
+
             // Adding to the list
-            cardInstances.Add(lastCardId, newInst);
+            cardInstances.Add(lastCardId, card);
             lastCardId++;
 
             // Fixing the positions
@@ -134,11 +138,11 @@ namespace BoardStuff
 
         public void RemoveCard(int cardId)
         {
-            GameObject card = cardInstances[cardId];
+            CardClickHandler card = cardInstances[cardId];
 
             cardInstances.Remove(cardId);
 
-            Destroy(card);
+            Destroy(card.gameObject);
 
             FixCardsPositions();
         }

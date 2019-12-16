@@ -3,8 +3,11 @@ using GameEngine;
 using GameStuff;
 using MetaInfo;
 using Preparing;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Match
 {
@@ -20,6 +23,11 @@ namespace Match
 
         public ChooserImpl chooser;
 
+        public GameObject yourTurnText;
+
+        public GameObject gameOverPanel;
+        public Text gameOverWinnerText;
+
         private Board board;
 
         private MatchController matchController;
@@ -32,32 +40,35 @@ namespace Match
 
         private Engine engine;
 
+        private bool matchIsGoing;
+
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            /*StuffPack.stuffClass = StuffClass.FPM;            
+            StuffPack.stuffClass = StuffClass.FICT;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
             // DEBUG
             CardFactory cardFactory = new CardFactoryImpl();
 
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 2));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 4));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 7));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 11));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 12));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 13));
 
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));*/
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
 
             board = new BoardController(boardStuffManager, 4,
                 chooser.CellClicked, chooser.CharacterClicked);
-
-            checkManager.SetCellInThePlacePredicate(board.GetCellByCoords);
 
             // Setting up the checks
             Dictionary<int, Check> checkLevels = CheckLevels.GetCheckLevels(StuffPack.stuffClass);
@@ -82,9 +93,14 @@ namespace Match
 
             // Setting up the match controller
             matchController = new MatchControllerImpl(board, chooser, cardsDemonstrator,
-                player, playerInfo, opponent, engine.GetPlayerInfo());
+                player, playerInfo, opponent, engine.GetPlayerInfo(), GameOver);
 
             engine.SetMatchController(matchController);
+
+            checkManager.SetCellInThePlacePredicate(board.GetCellByCoords);
+            checkManager.SetCanPlaceCheckThere(matchController.CanPlaceCheckThere);
+            checkManager.SetPlacableCellsFunctions(matchController.GetAllPlacableCells,
+                board.HighlightCells, board.UnhighlightCells);
 
             playerInfo.SetCheckPlacedAction(CheckPlaced);
             playerInfo.SetCheckClickedAction(chooser.CheckClicked);
@@ -92,6 +108,8 @@ namespace Match
             playerInfo.SetCanPlayCardPredicate(matchController.GetAllowedCardTypes);
 
             // Starting the game
+            matchIsGoing = true;
+
             if (matchController.GetCurrMovingPlayer() == player)
             {
                 StartPlayerTurn();
@@ -106,16 +124,35 @@ namespace Match
         {
             Debug.Log("Player's turn");
 
-            // TODO: Make "Your turn" animation
+            // "Your turn" animation
+            yourTurnText.SetActive(true);
+            Animator animator = yourTurnText.GetComponent<Animator>();
+            animator.SetInteger("YourTurnParam", 2);
+            animator.SetInteger("YourTurnParam", 1);
+            StartCoroutine(HideYourTurnText());
+        }
+
+        private IEnumerator HideYourTurnText()
+        {
+            yield return new WaitForSeconds(3);
+            yourTurnText.SetActive(false);
 
             // Allow user to play cards and characters
             playerInfo.SetActionsPermission(true);
             playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
         }
 
+        private IEnumerator StartPlayerTurnAfterFewSeconds(float secQuan)
+        {
+            yield return new WaitForSeconds(secQuan);
+            StartPlayerTurn();
+        }
+
         private void StartOpponentTurn()
         {
             Debug.Log("Computer's turn");
+
+            int computersTurn = 0;
 
             if (matchController.IsBattleNow())
             {
@@ -125,11 +162,11 @@ namespace Match
                 {
                     Debug.Log("Computer played a card");
                     matchController.PlayCard(card);
+                    computersTurn = 1;
                 }
                 else
                 {
                     Debug.Log("Computer skipped his turn");
-                    matchController.FinishMove();
                 }
             }
             else
@@ -141,13 +178,16 @@ namespace Match
                 {
                     Debug.Log("Computer placed a check");
                     matchController.PlaceCheck(move.check, move.cell);
+                    computersTurn = 2;
                 }
                 else
                 {
                     Debug.Log("Computer skipped his turn");
-                    matchController.FinishMove();
                 }
             }
+            matchController.FinishMove();
+
+            if (!matchIsGoing) return;
 
             if (matchController.GetCurrMovingPlayer() == opponent)
             {
@@ -155,20 +195,18 @@ namespace Match
             }
             else
             {
-                StartPlayerTurn();
+                if (computersTurn == 1)
+                    StartCoroutine(StartPlayerTurnAfterFewSeconds(2.5f));
+                else if (computersTurn == 2)
+                    StartCoroutine(StartPlayerTurnAfterFewSeconds(1));
+                else
+                    StartPlayerTurn();
             }
         }
 
         private void UpdatePlayerTurn()
         {
-            if (matchController.GetCurrMovingPlayer() == player)
-            {
-                playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
-            }
-            else
-            {
-                playerInfo.SetActionsPermission(false);
-            }
+            playerInfo.SetActionsPermission(false);
         }
 
         public void CardPlayed(Card card)
@@ -177,7 +215,10 @@ namespace Match
 
             matchController.PlayCard(card);
 
-            UpdatePlayerTurn();
+            if (card.GetCardType() != CardType.NO_BATTLE)
+            {
+                playerInfo.SetActionsPermission(false);
+            }
         }
 
         public void CheckPlaced(Check check, Cell cell)
@@ -186,12 +227,51 @@ namespace Match
 
             matchController.PlaceCheck(check, cell);
 
-            UpdatePlayerTurn();
+            if (matchController.IsBattleNow())
+            {
+                playerInfo.SetActionsPermission(false);
+            }
+            else
+            {
+                playerInfo.SetAllowedCharacters(false);
+            }
         }
 
         public void FinishTurn()
         {
-            StartOpponentTurn();
+            matchController.FinishMove();
+
+            if (matchIsGoing)
+            {
+                if (matchController.GetCurrMovingPlayer() == player)
+                    StartPlayerTurn();
+                else
+                    StartOpponentTurn();
+            }
+        }
+
+        public void GameOver(Player winner)
+        {
+            matchIsGoing = false;
+            playerInfo.SetActionsPermission(false);
+
+            gameOverPanel.SetActive(true);
+
+            if (winner == player)
+            {
+                Debug.Log("Game over. Player wins");
+                gameOverWinnerText.text = "Победитель - игрок";
+            }
+            else
+            {
+                Debug.Log("Game over. Computer wins");
+                gameOverWinnerText.text = "Победитель - компьютер";
+            }
+        }
+
+        public void ExitToMainMenu()
+        {
+            SceneManager.LoadScene("MainMenu");
         }
     }
 }

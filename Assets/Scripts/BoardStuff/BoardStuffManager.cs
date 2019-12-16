@@ -99,11 +99,20 @@ namespace BoardStuff
 
         public GameObject fpmIcon;
 
+        // Cell colors
+        private Color closedColor;
+        private Color openedColor;
+        private Color closedHighlightedColor;
+        private Color openedHighlightedColor;
+
         // Created cells
         private Dictionary<int, CellClickHandler> cells;
 
         // Cell effects
         private Dictionary<int, CellEffect> cellEffects;
+
+        // Cell states
+        private Dictionary<int, CellState> cellStates;
 
         // Numeric cell data
         private float cellHeight;
@@ -151,13 +160,21 @@ namespace BoardStuff
 
             cells = new Dictionary<int, CellClickHandler>();
             cellEffects = new Dictionary<int, CellEffect>();
+            cellStates = new Dictionary<int, CellState>();
+
+            closedColor = cellPrefab.GetComponent<Image>().color;
+            closedHighlightedColor = new Color(closedColor.r,
+                closedColor.g, closedColor.b, 0.78f);
+
+            openedColor = new Color(0.91f, 0.71f, 0.255f);
+            openedHighlightedColor = new Color(0.91f, 0.71f, 0.255f, 0.78f);
 
             // Characters
             charGameObjects = new Dictionary<StuffClass, CharacterClickHandler>();
 
             charGameObjects.Add(StuffClass.IASA, characterRed);
-            charGameObjects.Add(StuffClass.FICT, characterBlue);
-            charGameObjects.Add(StuffClass.FPM, characterGreen);
+            charGameObjects.Add(StuffClass.FICT, characterGreen);
+            charGameObjects.Add(StuffClass.FPM, characterBlue);
 
             characters = new Dictionary<int, CellCharacters>();
             charsCells = new Dictionary<int, int>();
@@ -193,6 +210,7 @@ namespace BoardStuff
                 bottomCell.SetClickAction(CellClicked);
 
                 cells.Add(2 * i + 1, bottomCell);
+                cellStates.Add(2 * i + 1, CellState.CLOSED);
 
                 // Top cell
                 Vector2 topCellPos = new Vector2(bottomCellPos.x + cellOffset + 2, cellHeight / 2);
@@ -204,6 +222,7 @@ namespace BoardStuff
                 topCell.SetClickAction(CellClicked);
 
                 cells.Add(2 * i, topCell);
+                cellStates.Add(2 * i, CellState.CLOSED);
             }
         }
 
@@ -223,8 +242,39 @@ namespace BoardStuff
             return null;
         }
 
+        public void HighlightPlacableCells(List<int> placableCells)
+        {
+            foreach (var pr in cells)
+            {
+                if (placableCells.Contains(pr.Key))
+                {
+                    Image image = pr.Value.GetComponent<Image>();
+
+                    if (cellStates[pr.Key] == CellState.CLOSED)
+                        image.color = closedHighlightedColor;
+                    else
+                        image.color = openedHighlightedColor;
+                }
+            }
+        }
+
+        public void UnhighlightCells()
+        {
+            foreach (var pr in cells)
+            {
+                Image image = pr.Value.GetComponent<Image>();
+
+                if (cellStates[pr.Key] == CellState.CLOSED)
+                    image.color = closedColor;
+                else
+                    image.color = openedColor;
+            }
+        }
+
         public void OpenCell(int cellId)
         {
+            cellStates[cellId] = CellState.OPENED;
+
             Animator animator = cells[cellId].GetComponent<Animator>();
             animator.SetInteger("cellState", 1);
         }
@@ -550,6 +600,7 @@ namespace BoardStuff
                 if (info.charPrefab == characterClickHandler)
                 {
                     characterClickedAction(info.id, cellId);
+                    return;
                 }
             }
             foreach (CharacterInfo info in characters[cellId].lower)
@@ -557,6 +608,7 @@ namespace BoardStuff
                 if (info.charPrefab == characterClickHandler)
                 {
                     characterClickedAction(info.id, cellId);
+                    return;
                 }
             }
         }

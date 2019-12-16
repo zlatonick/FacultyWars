@@ -163,6 +163,18 @@ namespace BoardStuff
             return checks;
         }
 
+        public int GetChecksCount()
+        {
+            int sum = 0;
+
+            foreach (var pr in checks)
+            {
+                sum += pr.Value;
+            }
+
+            return sum;
+        }
+
         public void SetActionsPermission(bool permission)
         {
             actionsAreAllowed = permission;
@@ -182,6 +194,12 @@ namespace BoardStuff
         public void AddCardToPlayed(Card card)
         {
             cardsPlayed.Add(card);
+        }
+
+        public void RemoveCheckFromHand(int checkLevel)
+        {
+            checkManager.RemoveCheck(checkLevel);
+            checks[checkLevel]--;
         }
     }
 }

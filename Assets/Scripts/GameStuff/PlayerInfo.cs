@@ -11,6 +11,8 @@ namespace GameStuff
 
         Dictionary<int, int> GetChecksInHand();
 
+        int GetChecksCount();
+
         List<Card> GetCardsPlayed();
 
         List<Check> GetChecksDead();
@@ -18,6 +20,8 @@ namespace GameStuff
         List<int> GetBattlesHistory();
 
         void AddCheckToHand(Check check);
+
+        void RemoveCheckFromHand(int checkLevel);
 
         void AddCardToHand(Card card);
 

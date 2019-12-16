@@ -25,8 +25,8 @@ namespace GameStuff
             Cell сell1 = controller.GetCharacterCell(character1);
             Cell сell2 = controller.GetCharacterCell(character2);
 
-            controller.MoveCharacter(character1, сell1);
-            controller.MoveCharacter(character2, сell2);
+            controller.MoveCharacter(character1, сell2);
+            controller.MoveCharacter(character2, сell1);
         }
 
         public override void Choose(Chooser chooser, Action<Card> afterChoosingAction)

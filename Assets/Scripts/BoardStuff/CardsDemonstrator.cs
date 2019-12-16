@@ -8,9 +8,7 @@ namespace BoardStuff
     public class CardsDemonstrator : MonoBehaviour
     {
         public CardsManager cardsManager;
-
-        //public GameObject playCardAnimation;
-
+        
         private GameObject displayedCard;
 
         public void DemonstrateCard(StuffClass stuffClass, CardType cardType, string text)
@@ -32,10 +30,6 @@ namespace BoardStuff
             displayedCard.transform.localPosition = new Vector2(-(cardWidth / 2), 0);
 
             displayedCard.transform.SetAsFirstSibling();      // Moving back
-
-            // Playing card animation
-            //Animator animator = playCardAnimation.GetComponent<Animator>();
-            //animator.SetInteger("CardPlayState", 1);
 
             StartCoroutine(RemoveCard());
         }

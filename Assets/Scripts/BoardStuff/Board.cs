@@ -24,6 +24,10 @@ namespace BoardStuff
 
         void MoveCharacterToCell(Character character, Cell cell);
 
+        void HighlightCells(List<Cell> cells);
+
+        void UnhighlightCells();
+
         void RemoveCell(Cell cell);
 
         void OpenCell(Cell cell);

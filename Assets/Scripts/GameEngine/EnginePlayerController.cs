@@ -124,5 +124,17 @@ namespace GameEngine
         {
 
         }
+
+        public int GetChecksCount()
+        {
+            int sum = 0;
+
+            foreach (var pr in checks)
+            {
+                sum += pr.Value;
+            }
+
+            return sum;
+        }
     }
 }

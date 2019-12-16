@@ -21,6 +21,8 @@ namespace BoardStuff
 
         private int level;
 
+        private Action dragStartedAction;
+
         private Action<CheckDragHandler, Vector2> dragFinishedAction;
 
         private Action<CheckDragHandler> clickedAction;
@@ -28,6 +30,7 @@ namespace BoardStuff
         void Start()
         {
             checksCountText = checksCount.GetComponentInChildren<Text>();
+            checkPrefab = null;
         }
 
         public void SetLevel(int level)
@@ -68,6 +71,11 @@ namespace BoardStuff
             }
         }
 
+        public void SetDragStartedAction(Action dragStartedAction)
+        {
+            this.dragStartedAction = dragStartedAction;
+        }
+
         public void SetDragFinishedAction(Action<CheckDragHandler, Vector2> dragFinishedAction)
         {
             this.dragFinishedAction = dragFinishedAction;
@@ -87,6 +95,8 @@ namespace BoardStuff
                     canvas.ScreenToCanvasPosition(eventData.position);
 
                 checkPrefab.transform.Find("ChecksCount").gameObject.SetActive(false);
+
+                dragStartedAction();
             }
         }
 
@@ -94,6 +104,11 @@ namespace BoardStuff
         {
             if (canDrag)
             {
+                if (checkPrefab == null)
+                {
+                    OnBeginDrag(eventData);
+                }
+
                 checkPrefab.transform.localPosition =
                     canvas.ScreenToCanvasPosition(eventData.position);
             }
@@ -104,6 +119,7 @@ namespace BoardStuff
             if (canDrag)
             {
                 Destroy(checkPrefab);
+                checkPrefab = null;
                 dragFinishedAction(this, canvas.ScreenToCanvasPosition(eventData.position));
             }
         }

@@ -16,6 +16,8 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
+            controller.GetPlayerInfo(battle.GetPlayer())
+                .RemoveCheckFromHand(chosenCheck.GetLevel());
             controller.PlaceCheck(chosenCheck, battle.GetCell());
         }
 
