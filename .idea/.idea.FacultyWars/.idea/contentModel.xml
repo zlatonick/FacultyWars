@@ -24,16 +24,20 @@
             <e p="BoardStuffManager.cs" t="Include" />
             <e p="CanvasPositioningExtensions.cs" t="Include" />
             <e p="CardClickHandler.cs" t="Include" />
+            <e p="CardsDemonstrator.cs" t="Include" />
             <e p="CardsManager.cs" t="Include" />
             <e p="Cell.cs" t="Include" />
+            <e p="CellClickHandler.cs" t="Include" />
             <e p="CellEffect.cs" t="Include" />
             <e p="CellImpl.cs" t="Include" />
             <e p="CellState.cs" t="Include" />
             <e p="Character.cs" t="Include" />
+            <e p="CharacterClickHandler.cs" t="Include" />
             <e p="CharacterFactory.cs" t="Include" />
             <e p="CharacterImpl.cs" t="Include" />
             <e p="CheckDragHandler.cs" t="Include" />
             <e p="CheckManager.cs" t="Include" />
+            <e p="ChooserImpl.cs" t="Include" />
             <e p="PlayerController.cs" t="Include" />
           </e>
           <e p="GameEngine" t="Include">
@@ -70,9 +74,31 @@
                 <e p="CardFict8.cs" t="Include" />
                 <e p="CardFict9.cs" t="Include" />
               </e>
+              <e p="FPM" t="Include">
+                <e p="CardFpm0.cs" t="Include" />
+                <e p="CardFpm1.cs" t="Include" />
+                <e p="CardFpm10.cs" t="Include" />
+                <e p="CardFpm11.cs" t="Include" />
+                <e p="CardFpm12.cs" t="Include" />
+                <e p="CardFpm13.cs" t="Include" />
+                <e p="CardFpm14.cs" t="Include" />
+                <e p="CardFpm15.cs" t="Include" />
+                <e p="CardFpm16.cs" t="Include" />
+                <e p="CardFpm17.cs" t="Include" />
+                <e p="CardFpm18.cs" t="Include" />
+                <e p="CardFpm2.cs" t="Include" />
+                <e p="CardFpm3.cs" t="Include" />
+                <e p="CardFpm4.cs" t="Include" />
+                <e p="CardFpm5.cs" t="Include" />
+                <e p="CardFpm6.cs" t="Include" />
+                <e p="CardFpm7.cs" t="Include" />
+                <e p="CardFpm8.cs" t="Include" />
+                <e p="CardFpm9.cs" t="Include" />
+              </e>
               <e p="IASA" t="Include">
                 <e p="CardIasa0.cs" t="Include" />
                 <e p="CardIasa1.cs" t="Include" />
+                <e p="CardIasa10.cs" t="Include" />
                 <e p="CardIasa2.cs" t="Include" />
                 <e p="CardIasa3.cs" t="Include" />
                 <e p="CardIasa4.cs" t="Include" />
@@ -87,6 +113,7 @@
             <e p="CheckFactory.cs" t="Include" />
             <e p="CheckFactoryImpl.cs" t="Include" />
             <e p="CheckImpl.cs" t="Include" />
+            <e p="CheckLevels.cs" t="Include" />
             <e p="Chooser.cs" t="Include" />
             <e p="MatchController.cs" t="Include" />
             <e p="PlayerInfo.cs" t="Include" />
