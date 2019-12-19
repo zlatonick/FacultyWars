@@ -304,7 +304,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: -0.12164307}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &111780990
@@ -1162,9 +1162,21 @@ MonoBehaviour:
   contentPanel: {fileID: 818073701}
   itemsPool: {fileID: 587134288}
   otherList: {fileID: 111780992}
-  spriteGoldCard: {fileID: 21300000, guid: c06b4c5d8f4d0437ca0a19d224b8dcb4, type: 3}
-  spriteSilverCard: {fileID: 21300000, guid: a632aa552aa764057bbbe79fa183f708, type: 3}
-  spriteNeutralCard: {fileID: 21300000, guid: cda0c3c7e0ed14ffd8235caf6a82a5d3, type: 3}
+  spriteGoldCardFict: {fileID: 21300000, guid: 72da388a55da5b548b5328ec7bfc4789, type: 3}
+  spriteSilverCardFict: {fileID: 21300000, guid: 9a084667beab3034fa0110b2aa3a1b52,
+    type: 3}
+  spriteNeutralCardFict: {fileID: 21300000, guid: b5ca0d6839c8a7d4fa6d3110b90211ad,
+    type: 3}
+  spriteGoldCardIpsa: {fileID: 21300000, guid: 28cc99a99021d2c4d96ee9443ce3a7e8, type: 3}
+  spriteSilverCardIpsa: {fileID: 21300000, guid: c22cdc16b092b7348bf523145765be49,
+    type: 3}
+  spriteNeutralCardIpsa: {fileID: 21300000, guid: 6ee6c13d03eb3c74499ba57629f0d61a,
+    type: 3}
+  spriteGoldCardFpm: {fileID: 21300000, guid: f7f0816193ce1da46a77ab27e4d58192, type: 3}
+  spriteSilverCardFpm: {fileID: 21300000, guid: 776ef5fcb2db45e4e80f0404a0159bc4,
+    type: 3}
+  spriteNeutralCardFpm: {fileID: 21300000, guid: 248e8870ecf3d8647ae47a9503396721,
+    type: 3}
   cardPrefab: {fileID: 7535605640498508648, guid: 00284589779914501b3f0372e03a5648,
     type: 3}
   cardOffset: 0

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameStuff;
+using MetaInfo;
 using Preparing.list_items;
 using Preparing.pools;
 using UnityEngine;
@@ -17,10 +18,18 @@ namespace Preparing.lists
 
         public PickedShopScrollList otherList;
 
-        public Sprite spriteGoldCard;
-        public Sprite spriteSilverCard;
-        public Sprite spriteNeutralCard;
+        public Sprite spriteGoldCardFict;
+        public Sprite spriteSilverCardFict;
+        public Sprite spriteNeutralCardFict;
 
+        public Sprite spriteGoldCardIpsa;
+        public Sprite spriteSilverCardIpsa;
+        public Sprite spriteNeutralCardIpsa;
+        
+        public Sprite spriteGoldCardFpm;
+        public Sprite spriteSilverCardFpm;
+        public Sprite spriteNeutralCardFpm;
+        
         [Header("Other objects")] public GameObject cardPrefab;
 
         [Range(0, 500)] public int cardOffset;
@@ -48,9 +57,23 @@ namespace Preparing.lists
                 var card = cardFactory.GetCard(StuffPack.stuffClass, i);
                 var itemButton = itemsPool.GetObject();
                 itemButton.transform.SetParent(contentPanel);
-
+                
+                List<Sprite> sprites = new List<Sprite>();
+                switch (StuffPack.stuffClass)
+                {
+                    case StuffClass.FICT:
+                        sprites = new List<Sprite>() { spriteGoldCardFict, spriteSilverCardFict, spriteNeutralCardFict };
+                        break;
+                    case StuffClass.IASA:
+                        sprites = new List<Sprite>() { spriteGoldCardIpsa, spriteSilverCardIpsa, spriteNeutralCardIpsa };
+                        break;
+                    case StuffClass.FPM:
+                        sprites = new List<Sprite>() { spriteGoldCardFpm, spriteSilverCardFpm, spriteNeutralCardFpm };
+                        break;
+                }
+                
                 var shopItemButton = itemButton.GetComponent<ShopItemButton>();
-                shopItemButton.Setup(card, this, new List<Sprite>() { spriteGoldCard, spriteSilverCard, spriteNeutralCard });
+                shopItemButton.Setup(card, this, sprites);
 
                 _instCards[i] = itemButton;
                 
