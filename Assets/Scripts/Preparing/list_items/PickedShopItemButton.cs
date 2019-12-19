@@ -24,6 +24,8 @@ namespace Preparing.list_items
             priceLabel.text = "$" + item.itemPrice;
 
             _scrollList = scrollList;
+
+            button.transform.localScale = new Vector2(1, 1);
         }
 
         public void HandleClick()

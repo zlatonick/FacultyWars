@@ -1162,9 +1162,9 @@ MonoBehaviour:
   contentPanel: {fileID: 818073701}
   itemsPool: {fileID: 587134288}
   otherList: {fileID: 111780992}
-  spriteGoldCard: {fileID: 21300000, guid: bfa5444e2df6bcc44832d43f1f790116, type: 3}
-  spriteSilverCard: {fileID: 21300000, guid: 0de1112ac1a14264d8df2050158de0c5, type: 3}
-  spriteNeutralCard: {fileID: 21300000, guid: f661bff187cc66c4383ece27a59796af, type: 3}
+  spriteGoldCard: {fileID: 21300000, guid: c06b4c5d8f4d0437ca0a19d224b8dcb4, type: 3}
+  spriteSilverCard: {fileID: 21300000, guid: a632aa552aa764057bbbe79fa183f708, type: 3}
+  spriteNeutralCard: {fileID: 21300000, guid: cda0c3c7e0ed14ffd8235caf6a82a5d3, type: 3}
   cardPrefab: {fileID: 7535605640498508648, guid: 00284589779914501b3f0372e03a5648,
     type: 3}
   cardOffset: 0
