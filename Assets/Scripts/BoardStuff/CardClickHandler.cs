@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace BoardStuff
 {
@@ -25,6 +26,7 @@ namespace BoardStuff
         private bool isDraggingNow;
         private bool canEnlarge;
 
+        private Action<int> dragStartedAction;
         private Action<int> cardPlayedAction;
         private Func<int, bool> canDragNow;
 
@@ -77,6 +79,11 @@ namespace BoardStuff
             this.canDragNow = canDragNow;
         }
 
+        public void SetDragStartedAction(Action<int> dragStartedAction)
+        {
+            this.dragStartedAction = dragStartedAction;
+        }
+
         public void SetCardPlayedAction(Action<int> cardPlayedAction)
         {
             this.cardPlayedAction = cardPlayedAction;
@@ -107,11 +114,6 @@ namespace BoardStuff
             biggerPrefab.transform.localPosition = biggerPos;
         }
 
-        void OnDestroy()
-        {
-            Destroy(biggerPrefab);
-        }
-
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (canDragNow(cardId))
@@ -124,6 +126,10 @@ namespace BoardStuff
                 dragPrefab.transform.localPosition =
                     canvas.ScreenToCanvasPosition(eventData.position);
                 dragPrefab.name = "Dragging";
+
+                Image cardImage = gameObject.GetComponentInChildren<Image>();
+                cardImage.color = Color.clear;
+                dragStartedAction(cardId);
             }
         }
 
@@ -144,6 +150,7 @@ namespace BoardStuff
                 isDraggingNow = false;
                 canEnlarge = true;
                 Destroy(dragPrefab);
+                Destroy(biggerPrefab);
                 cardPlayedAction(cardId);
             }
         }

@@ -52,10 +52,16 @@ namespace Match
             // DEBUG
             CardFactory cardFactory = new CardFactoryImpl();
 
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 0));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 1));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 2));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 3));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 4));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 5));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 6));
             StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 7));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 11));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 12));
-            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 13));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 8));
+            StuffPack.cards.Add(cardFactory.GetCard(StuffPack.stuffClass, 9));
 
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
@@ -134,12 +140,16 @@ namespace Match
 
         private IEnumerator HideYourTurnText()
         {
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(2);
             yourTurnText.SetActive(false);
 
             // Allow user to play cards and characters
             playerInfo.SetActionsPermission(true);
             playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
+
+            // Highlight available cards in hand
+            playerInfo.UnhighlightCards();
+            playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
         }
 
         private IEnumerator StartPlayerTurnAfterFewSeconds(float secQuan)
@@ -204,11 +214,6 @@ namespace Match
             }
         }
 
-        private void UpdatePlayerTurn()
-        {
-            playerInfo.SetActionsPermission(false);
-        }
-
         public void CardPlayed(Card card)
         {
             Debug.Log("Player has played a card");
@@ -219,6 +224,10 @@ namespace Match
             {
                 playerInfo.SetActionsPermission(false);
             }
+
+            // Highlight available cards in hand
+            playerInfo.UnhighlightCards();
+            playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
         }
 
         public void CheckPlaced(Check check, Cell cell)
@@ -235,11 +244,16 @@ namespace Match
             {
                 playerInfo.SetAllowedCharacters(false);
             }
+
+            // Highlight available cards in hand
+            playerInfo.UnhighlightCards();
+            playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
         }
 
         public void FinishTurn()
         {
             matchController.FinishMove();
+            playerInfo.UnhighlightCards();
 
             if (matchIsGoing)
             {

@@ -17,9 +17,8 @@ namespace GameStuff
 
             int maxPower = myPower > enemyPower ? myPower : enemyPower;
 
-            controller.ChangePowerSafe(battle.GetCharacter(), maxPower - myPower);
+            controller.ChangePowerSafe(battle.GetCharacter(), maxPower - myPower + 20);
             controller.ChangePowerSafe(battle.GetEnemyCharacter(), maxPower - enemyPower);
-            controller.ChangePowerSafe(battle.GetCharacter(), 20);
         }
 
         

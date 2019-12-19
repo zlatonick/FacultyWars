@@ -155,7 +155,7 @@ namespace BoardStuff
             cellWidth = cellPrefabRect.sizeDelta.x * cellPrefabRect.localScale.x;
             cellHeight = cellPrefabRect.sizeDelta.y * cellPrefabRect.localScale.y;
 
-            cellOffset = 49;
+            cellOffset = 44;
             cellWidthClear = cellWidth - cellOffset;
 
             cells = new Dictionary<int, CellClickHandler>();
@@ -358,7 +358,17 @@ namespace BoardStuff
             Animator animator = cells[cellId].GetComponent<Animator>();
             animator.SetInteger("cellState", 2);
 
+            StartCoroutine(DestoryCellAfterFewSeconds(cells[cellId].gameObject));
+
             cells.Remove(cellId);
+            cellEffects.Remove(cellId);
+            cellStates.Remove(cellId);
+        }
+
+        private IEnumerator DestoryCellAfterFewSeconds(GameObject cell)
+        {
+            yield return new WaitForSeconds(2);
+            Destroy(cell);
         }
 
         private bool PointIsInCell(Vector2 vecX, Vector2 vecY, Vector2 point)

@@ -15,7 +15,13 @@ namespace BoardStuff
         public CardClickHandler[] fictCards;
         public CardClickHandler[] fpmCards;
 
+        public GameObject cardLightning;
+
         private Dictionary<int, CardClickHandler> cardInstances;
+
+        private Dictionary<int, GameObject> cardLightnings;
+
+        private CardClickHandler cardDragging;
 
         // Some metrical characteristics
         private int lastCardId;
@@ -32,6 +38,7 @@ namespace BoardStuff
         void Start()
         {
             cardInstances = new Dictionary<int, CardClickHandler>();
+            cardLightnings = new Dictionary<int, GameObject>();
             lastCardId = 0;
 
             // Calculating some metrics
@@ -45,6 +52,34 @@ namespace BoardStuff
             cardsDistance = cardPanelWidth / 40;
         }
 
+        public void HighlightCards(List<int> availableCards)
+        {
+            foreach (int cardId in availableCards)
+            {
+                GameObject lightning = Instantiate(cardLightning, transform, false);
+
+                CardClickHandler card = cardInstances[cardId];
+                Vector2 cardPos = card.transform.localPosition;
+                float cardsScaleX = card.transform.localScale.x;
+
+                lightning.transform.localPosition = new Vector2(
+                    cardPos.x - 50f / 2 * cardsScaleX, cardPos.y);
+
+                lightning.transform.SetSiblingIndex(card.transform.GetSiblingIndex());
+
+                cardLightnings.Add(cardId, lightning);
+            }
+        }
+
+        public void UnhighlightCards()
+        {
+            foreach (var pr in cardLightnings)
+            {
+                Destroy(pr.Value);
+            }
+            cardLightnings.Clear();
+        }
+
         public void SetCardPlayedAction(Action<int> cardPlayedAction)
         {
             this.cardPlayedAction = cardPlayedAction;
@@ -53,6 +88,20 @@ namespace BoardStuff
         public void SetCanPlayCardPredicate(Func<int, bool> canPlayCard)
         {
             this.canPlayCard = canPlayCard;
+        }
+
+        private void DragStartedAction(int cardId)
+        {
+            HideCard(cardId);
+            UnhighlightCards();
+        }
+
+        private void DragFinishedAction(int cardId)
+        {
+            Destroy(cardDragging.gameObject);
+            cardDragging = null;
+
+            cardPlayedAction(cardId);
         }
 
         private void FixCardsPositions()
@@ -117,7 +166,8 @@ namespace BoardStuff
             // Setting the parameters
             CardClickHandler card = newInst.GetComponent<CardClickHandler>();
             card.SetId(lastCardId);
-            card.SetCardPlayedAction(cardPlayedAction);
+            card.SetDragStartedAction(DragStartedAction);
+            card.SetCardPlayedAction(DragFinishedAction);
             card.SetCanvas(canvas);
             card.SetCanDragPredicate(canPlayCard);
 
@@ -136,13 +186,10 @@ namespace BoardStuff
             return lastCardId - 1;
         }
 
-        public void RemoveCard(int cardId)
+        private void HideCard(int cardId)
         {
-            CardClickHandler card = cardInstances[cardId];
-
+            cardDragging = cardInstances[cardId];
             cardInstances.Remove(cardId);
-
-            Destroy(card.gameObject);
 
             FixCardsPositions();
         }

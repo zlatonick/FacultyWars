@@ -13,12 +13,14 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
+            Player myPlayer = controller.GetCurrMovingPlayer();
+
             List<Character> characters = controller.GetAllCharacters();
-            PlayerInfo playerInfo = controller.GetPlayerInfo(battle.GetPlayer());
+            PlayerInfo playerInfo = controller.GetPlayerInfo(myPlayer);
 
             foreach (Character character in characters)
             {
-                if (character.GetPlayer() == battle.GetPlayer())
+                if (character.GetPlayer() == myPlayer)
                 {
                     playerInfo.AddCardToHand(new CardAll0(GetStuffClass()));
                 }

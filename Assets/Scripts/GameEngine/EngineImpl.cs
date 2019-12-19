@@ -21,6 +21,8 @@ namespace GameEngine
 
         private System.Random random;
 
+        private int[] cardsQuan;
+
         public EngineImpl(StuffClass stuffClass, Dictionary<int, Check> checkLevels)
         {
             this.stuffClass = stuffClass;
@@ -28,21 +30,22 @@ namespace GameEngine
 
             // Determined start pack
             cardFactory = new CardFactoryImpl();
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 0));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 0));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 0));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 2));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 3));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 4));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 5));
+            playerInfo.AddCardToHand(cardFactory.GetCard(stuffClass, 6));
+
+            cardsQuan = new int[10] { 3, 0, 1, 1, 1, 1, 1, 0, 0, 0 };
 
             checkFactory = new CheckFactoryImpl();
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 0));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 0));
             playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
-            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 1));
+            playerInfo.AddCheckToHand(checkFactory.GetCheck(stuffClass, 2));
 
             // Some settings
             random = new System.Random();
@@ -65,16 +68,64 @@ namespace GameEngine
 
         public Card MakeBattleMove()
         {
+            List<Battle> battles = controller.GetCurrBattles();
+
+            int myTotalPower = battles[0].GetCharacter().GetPower();
+            int opponentTotalPower = 0;
+            int opponentsQuan = 0;
+
+            foreach (Battle battle in battles)
+            {
+                opponentTotalPower += battle.GetEnemyCharacter().GetPower();
+                opponentsQuan++;
+            }
+
+            if (myTotalPower > opponentTotalPower) return null;
+
             CardType maxCardType = controller.GetAllowedCardTypes();
 
             List<Card> cards = new List<Card>(playerInfo.GetCardsInHand());
-            cards.RemoveAll(card => (int)card.GetCardType() < (int)maxCardType);
 
             if (cards.Count == 0) return null;
 
-            Card cardPlay = cards[random.Next(cards.Count)];
+            int powerDiffer = opponentTotalPower - myTotalPower;
 
-            playerInfo.RemoveCardFromHand(cardPlay);
+            Card cardPlay = null;
+
+            if (myTotalPower >= 70 && powerDiffer < 30 && cardsQuan[2] > 0 && maxCardType <= CardType.SILVER)
+            {
+                cardPlay = cards.Find(card => card.GetId() == 2);
+                cardsQuan[2]--;
+            }
+            else if (powerDiffer < 20 && cardsQuan[0] > 0 && maxCardType <= CardType.SILVER)
+            {
+                cardPlay = cards.Find(card => card.GetId() == 0);
+                cardsQuan[0]--;
+            }
+            else if (opponentTotalPower < 80 && cardsQuan[5] > 0 && maxCardType <= CardType.SILVER)
+            {
+                cardPlay = cards.Find(card => card.GetId() == 5);
+                cardsQuan[5]--;
+            }
+            else if (opponentsQuan == 1 && cardsQuan[3] > 0 && maxCardType <= CardType.GOLD
+                && battles[0].GetEnemyCharacter().GetStartPower() < battles[0].GetCharacter().GetStartPower())
+            {
+                cardPlay = cards.Find(card => card.GetId() == 3);
+                cardsQuan[3]--;
+            }
+            else if (opponentsQuan == 1 && cardsQuan[4] > 0 && maxCardType <= CardType.GOLD)
+            {
+                cardPlay = cards.Find(card => card.GetId() == 4);
+                cardsQuan[4]--;
+            }
+            else if (cardsQuan[6] > 0 && maxCardType <= CardType.GOLD)
+            {
+                cardPlay = cards.Find(card => card.GetId() == 6);
+                cardsQuan[6]--;
+            }
+
+            if (cardPlay != null) playerInfo.RemoveCardFromHand(cardPlay);
+
             return cardPlay;
         }
 

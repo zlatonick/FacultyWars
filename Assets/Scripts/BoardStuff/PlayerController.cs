@@ -99,8 +99,6 @@ namespace BoardStuff
 
         private void OnCardPlayed(int cardId)
         {
-            cardsManager.RemoveCard(cardId);
-
             Card card = cards[cardId];
             
             cards.Remove(cardId);
@@ -200,6 +198,26 @@ namespace BoardStuff
         {
             checkManager.RemoveCheck(checkLevel);
             checks[checkLevel]--;
+        }
+
+        public void HighlightPlayableCards(CardType maxCardType)
+        {
+            List<int> availableCards = new List<int>();
+
+            foreach (var pr in cards)
+            {
+                if (pr.Value.GetCardType() >= maxCardType)
+                {
+                    availableCards.Add(pr.Key);
+                }
+            }
+
+            cardsManager.HighlightCards(availableCards);
+        }
+
+        public void UnhighlightCards()
+        {
+            cardsManager.UnhighlightCards();
         }
     }
 }

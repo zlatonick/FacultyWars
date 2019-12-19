@@ -9,6 +9,8 @@ namespace BoardStuff
     {
         private BoardStuffManager boardStuffManager;
 
+        private int cellsPairsQuan;
+
         private Dictionary<int, Cell> cells;
 
         private Dictionary<Cell, List<Character>> cellsCharacters;
@@ -23,6 +25,11 @@ namespace BoardStuff
             Action<Cell> cellClickedAction, Action<Character> characterClickedAction)
         {
             this.boardStuffManager = boardStuffManager;
+            this.cellsPairsQuan = cellsPairsQuan;
+
+            // Creating cell objects
+            cells = new Dictionary<int, Cell>();
+            cellsCharacters = new Dictionary<Cell, List<Character>>();
 
             // Actions
             this.cellClickedAction = cellClickedAction;
@@ -31,12 +38,16 @@ namespace BoardStuff
             this.boardStuffManager.SetCellClickedAction(OnCellClicked);
             this.boardStuffManager.SetCharacterClickedAction(OnCharacterClicked);
 
+            // Creating character factory
+            characterFactory = new CharacterFactory(boardStuffManager);
+
+            FillBoard();
+        }
+
+        private void FillBoard()
+        {
             // Creating all the cell prefabs
             boardStuffManager.FillBoardWithCells(cellsPairsQuan);
-
-            // Creating cell objects
-            cells = new Dictionary<int, Cell>();
-            cellsCharacters = new Dictionary<Cell, List<Character>>();
 
             for (int i = 0; i < 2 * cellsPairsQuan; i++)
             {
@@ -44,9 +55,6 @@ namespace BoardStuff
                 cells.Add(i, cell);
                 cellsCharacters.Add(cell, new List<Character>());
             }
-
-            // Creating character factory
-            characterFactory = new CharacterFactory(boardStuffManager);
         }
 
         public void DestroyCharacter(Character character)
@@ -109,6 +117,12 @@ namespace BoardStuff
 
             cells.Remove(cell.GetId());
             cellsCharacters.Remove(cell);
+
+            // Checking if no cells left
+            if (cells.Count == 0)
+            {
+                FillBoard();
+            }
         }
 
         public void HighlightCells(List<Cell> cells)

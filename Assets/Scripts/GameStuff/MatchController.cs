@@ -56,5 +56,7 @@ namespace GameStuff
         void OpenCell(Cell cell, CellState newState);
 
         PlayerInfo GetPlayerInfo(Player player);
+
+        List<Battle> GetCurrBattles();
     }
 }

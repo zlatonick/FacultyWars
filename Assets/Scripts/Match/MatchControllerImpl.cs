@@ -243,8 +243,16 @@ namespace Match
                 if (isBattleNow)
                 {
                     Cell cell = board.GetCharacterCell(character);
-                    List<Character> characters = board.GetCharactersOnCell(cell);
 
+                    if (battles[currPlayer][0].GetCell() != cell)
+                    {
+                        board.DestroyCharacter(character);
+                        playersInfo[charPlayer].AddCheckToDead(checkFactory.GetCheck(
+                            character.GetStuffClass(), character.GetLevel()));
+                        return;
+                    }
+
+                    List<Character> characters = board.GetCharactersOnCell(cell);
                     List<Character> friendly = new List<Character>(characters);
                     friendly.RemoveAll(ch => ch.GetPlayer() != charPlayer);
 
@@ -809,6 +817,13 @@ namespace Match
             if (opponentInfo.GetChecksCount() == 0) return currPlayer;
 
             return null;
+        }
+
+        public List<Battle> GetCurrBattles()
+        {
+            if (!isBattleNow) return null;
+
+            return battles[currPlayer];
         }
     }
 }
