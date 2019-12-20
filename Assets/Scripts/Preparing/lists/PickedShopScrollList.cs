@@ -36,7 +36,7 @@ namespace Preparing
 
         private void RefreshDisplay()
         {
-            moneyAmountText.text = "Total money: " + money;
+            moneyAmountText.text = "" + money;
             RemoveButtons();
             AddButtons();
         }

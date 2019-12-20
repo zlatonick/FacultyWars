@@ -12,30 +12,47 @@ namespace BoardStuff
         public Canvas canvas;
 
         // Additional classes to store cell and character info
-        class CellEffect
+        public class CellEffect
         {
             public int effectsQuan;
 
             public GameObject icon;
             public GameObject icon_2;
 
+            StuffClass stuffClass;
+            int power;
+            StuffClass stuffClass2;
+            int power2;
+
             public CellEffect()
             {
                 effectsQuan = 0;
             }
 
-            public CellEffect(GameObject icon)
+            public CellEffect(StuffClass stuffClass, int power, GameObject icon)
             {
                 effectsQuan = 1;
+                this.stuffClass = stuffClass;
+                this.power = power;
                 this.icon = icon;
             }
 
-            public CellEffect(GameObject icon, GameObject icon_2)
+            public CellEffect(StuffClass stuffClass, int power, GameObject icon,
+                StuffClass stuffClass2, int power2, GameObject icon_2)
             {
                 effectsQuan = 2;
+                this.stuffClass = stuffClass;
+                this.power = power;
                 this.icon = icon;
+                this.stuffClass2 = stuffClass2;
+                this.power2 = power2;
                 this.icon_2 = icon_2;
             }
+            public int EffectsQuan { get => effectsQuan; set => effectsQuan = value; }
+            public StuffClass StuffClass { get => stuffClass; set => stuffClass = value; }
+            public int Power { get => power; set => power = value; }
+            public StuffClass StuffClass2 { get => stuffClass2; set => stuffClass2 = value; }
+            public int Power2 { get => power2; set => power2 = value; }
         }
 
         class CharacterInfo
@@ -98,6 +115,11 @@ namespace BoardStuff
         public GameObject fictIcon;
 
         public GameObject fpmIcon;
+
+        // Cell effect panel
+        public GameObject cellEffectPanel;
+
+        public GameObject[] effectsStraight;
 
         // Cell colors
         private Color closedColor;
@@ -198,19 +220,9 @@ namespace BoardStuff
         {
             for (int i = 0; i < pairCellsQuan; i++)
             {
-                // Bottom cell
                 Vector2 bottomCellPos = new Vector2(
                     -cellWidth / 2 + cellWidthClear * (i - 1),
                     -cellHeight / 2);
-
-                CellClickHandler bottomCell = Instantiate(cellPrefab, transform, false);
-                bottomCell.transform.localPosition = bottomCellPos;
-
-                bottomCell.SetCanvas(canvas);
-                bottomCell.SetClickAction(CellClicked);
-
-                cells.Add(2 * i + 1, bottomCell);
-                cellStates.Add(2 * i + 1, CellState.CLOSED);
 
                 // Top cell
                 Vector2 topCellPos = new Vector2(bottomCellPos.x + cellOffset + 2, cellHeight / 2);
@@ -219,10 +231,24 @@ namespace BoardStuff
                 topCell.transform.localPosition = topCellPos;
 
                 topCell.SetCanvas(canvas);
+                topCell.SetCellEffectPanel(cellEffectPanel);
                 topCell.SetClickAction(CellClicked);
+                topCell.SetEffectsStraight(effectsStraight);
 
                 cells.Add(2 * i, topCell);
                 cellStates.Add(2 * i, CellState.CLOSED);
+
+                // Bottom cell
+                CellClickHandler bottomCell = Instantiate(cellPrefab, transform, false);
+                bottomCell.transform.localPosition = bottomCellPos;
+
+                bottomCell.SetCanvas(canvas);
+                bottomCell.SetCellEffectPanel(cellEffectPanel);
+                bottomCell.SetClickAction(CellClicked);
+                bottomCell.SetEffectsStraight(effectsStraight);
+
+                cells.Add(2 * i + 1, bottomCell);
+                cellStates.Add(2 * i + 1, CellState.CLOSED);
             }
         }
 
@@ -293,7 +319,7 @@ namespace BoardStuff
             Text middleText = cell.transform.Find("text_middle").gameObject.GetComponent<Text>();
             middleText.text = "" + (power > 0 ? "+" : "") + power;
 
-            cellEffects.Add(cellId, new CellEffect(stuffClassIcon));
+            cellEffects.Add(cellId, new CellEffect(stuffClass, power, stuffClassIcon));
         }
 
         public void SetEffect(int cellId, StuffClass stuffClass, int power,
@@ -318,7 +344,8 @@ namespace BoardStuff
             topText.text = "" + (power > 0 ? "+" : "") + power;
             bottomText.text = "" + (power2 > 0 ? "+" : "") + power2;
 
-            cellEffects.Add(cellId, new CellEffect(stuffClassIcon, stuffClassIcon2));
+            cellEffects.Add(cellId, new CellEffect(stuffClass, power, stuffClassIcon,
+                stuffClass2, power2, stuffClassIcon2));
         }
 
         public void RemoveEffect(int cellId)
@@ -599,6 +626,11 @@ namespace BoardStuff
         {
             int cellId = GetCellIdByCoords(pos);
             cellClickedAction(cellId);
+
+            if (cellEffects.ContainsKey(cellId))
+            {
+                cells[cellId].ShowHideEffectPanel(cellEffects[cellId]);
+            }
         }
 
         public void CharacterClicked(CharacterClickHandler characterClickHandler, Vector2 pos)

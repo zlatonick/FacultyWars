@@ -23,6 +23,9 @@ namespace Match
 
         public ChooserImpl chooser;
 
+        public Text opponentPanelChecks;
+        public Text opponentPanelCards;
+
         public GameObject yourTurnText;
 
         public GameObject gameOverPanel;
@@ -38,9 +41,13 @@ namespace Match
 
         private PlayerController playerInfo;
 
+        private PlayerInfo opponentInfo;
+
         private Engine engine;
 
         private bool matchIsGoing;
+
+        private bool isFinishMoveClickable;
 
         void Start()
         {
@@ -66,11 +73,11 @@ namespace Match
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
+            /*StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));*/
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
 
             board = new BoardController(boardStuffManager, 4,
@@ -96,10 +103,12 @@ namespace Match
             // Setting up the opponent (AI)
             engine = EngineCreator.CreateEngine();      // IASA by default
             opponent = new Player(1, engine.GetStuffClass());
+            opponentInfo = engine.GetPlayerInfo();
+            UpdateOpponentPanel();
 
             // Setting up the match controller
             matchController = new MatchControllerImpl(board, chooser, cardsDemonstrator,
-                player, playerInfo, opponent, engine.GetPlayerInfo(), GameOver);
+                player, playerInfo, opponent, opponentInfo, GameOver);
 
             engine.SetMatchController(matchController);
 
@@ -115,6 +124,7 @@ namespace Match
 
             // Starting the game
             matchIsGoing = true;
+            isFinishMoveClickable = false;
 
             if (matchController.GetCurrMovingPlayer() == player)
             {
@@ -124,6 +134,12 @@ namespace Match
             {
                 StartOpponentTurn();
             }
+        }
+
+        private void UpdateOpponentPanel()
+        {
+            opponentPanelChecks.text = "x" + opponentInfo.GetChecksCount();
+            opponentPanelCards.text = "x" + opponentInfo.GetCardsInHand().Count;
         }
 
         private void StartPlayerTurn()
@@ -146,6 +162,7 @@ namespace Match
             // Allow user to play cards and characters
             playerInfo.SetActionsPermission(true);
             playerInfo.SetAllowedCharacters(matchController.AreCharactersAllowed());
+            isFinishMoveClickable = true;
 
             // Highlight available cards in hand
             playerInfo.UnhighlightCards();
@@ -195,6 +212,8 @@ namespace Match
                     Debug.Log("Computer skipped his turn");
                 }
             }
+
+            UpdateOpponentPanel();
             matchController.FinishMove();
 
             if (!matchIsGoing) return;
@@ -220,14 +239,17 @@ namespace Match
 
             matchController.PlayCard(card);
 
-            if (card.GetCardType() != CardType.NO_BATTLE)
-            {
-                playerInfo.SetActionsPermission(false);
-            }
-
-            // Highlight available cards in hand
             playerInfo.UnhighlightCards();
-            playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
+            playerInfo.SetActionsPermission(false);
+
+            isFinishMoveClickable = false;
+            StartCoroutine(UnlockFinishTurnAfterFewSeconds(2.5f));
+        }
+
+        private IEnumerator UnlockFinishTurnAfterFewSeconds(float secQuan)
+        {
+            yield return new WaitForSeconds(secQuan);
+            isFinishMoveClickable = true;
         }
 
         public void CheckPlaced(Check check, Cell cell)
@@ -236,6 +258,8 @@ namespace Match
 
             matchController.PlaceCheck(check, cell);
 
+            playerInfo.UnhighlightCards();
+
             if (matchController.IsBattleNow())
             {
                 playerInfo.SetActionsPermission(false);
@@ -243,24 +267,28 @@ namespace Match
             else
             {
                 playerInfo.SetAllowedCharacters(false);
-            }
 
-            // Highlight available cards in hand
-            playerInfo.UnhighlightCards();
-            playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
+                // Highlight available cards in hand
+                playerInfo.HighlightPlayableCards(matchController.GetAllowedCardTypes());
+            }
         }
 
         public void FinishTurn()
         {
-            matchController.FinishMove();
-            playerInfo.UnhighlightCards();
-
-            if (matchIsGoing)
+            if (isFinishMoveClickable)
             {
-                if (matchController.GetCurrMovingPlayer() == player)
-                    StartPlayerTurn();
-                else
-                    StartOpponentTurn();
+                isFinishMoveClickable = false;
+
+                matchController.FinishMove();
+                playerInfo.UnhighlightCards();
+
+                if (matchIsGoing)
+                {
+                    if (matchController.GetCurrMovingPlayer() == player)
+                        StartPlayerTurn();
+                    else
+                        StartOpponentTurn();
+                }
             }
         }
 

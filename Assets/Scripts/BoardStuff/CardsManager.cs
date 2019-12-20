@@ -114,12 +114,17 @@ namespace BoardStuff
             {
                 float margin = (cardPanelWidth - totalCardsWidth) / 2;
 
+                List<int> keys = new List<int>(cardInstances.Keys);
+                keys.Sort();
+
                 int cardIndex = 0;
-                foreach (var card in cardInstances)
+                for (int i = 0; i < keys.Count; i++)
                 {
+                    CardClickHandler card = cardInstances[keys[i]];
+
                     float coordX = margin + cardIndex * (cardWidth + cardsDistance);
-                    card.Value.transform.localPosition = new Vector2(coordX, 0);
-                    card.Value.FixBigPrefabPosition();
+                    card.transform.localPosition = new Vector2(coordX, 0);
+                    card.FixBigPrefabPosition();
 
                     cardIndex++;
                 }
@@ -128,12 +133,17 @@ namespace BoardStuff
             {
                 float cardsInnerDist = (cardPanelWidth - cardWidth) / (cardsQuan - 1);
 
+                List<int> keys = new List<int>(cardInstances.Keys);
+                keys.Sort();
+
                 int cardIndex = 0;
-                foreach (var card in cardInstances)
+                for (int i = 0; i < keys.Count; i++)
                 {
+                    CardClickHandler card = cardInstances[keys[i]];
+
                     float coordX = cardIndex * cardsInnerDist;
-                    card.Value.transform.localPosition = new Vector2(coordX, 0);
-                    card.Value.FixBigPrefabPosition();
+                    card.transform.localPosition = new Vector2(coordX, 0);
+                    card.FixBigPrefabPosition();
 
                     cardIndex++;
                 }
@@ -171,7 +181,7 @@ namespace BoardStuff
             card.SetCanvas(canvas);
             card.SetCanDragPredicate(canPlayCard);
 
-            var cardText = newInst.GetComponentInChildren<Text>();
+            Text cardText = newInst.GetComponentInChildren<Text>();
             cardText.text = text;
 
             card.InitCard();
