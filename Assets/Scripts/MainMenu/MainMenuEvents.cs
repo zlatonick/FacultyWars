@@ -34,4 +34,9 @@ public class MainMenuEvents : MonoBehaviour
 
         SceneManager.LoadScene("Preparing");
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }
