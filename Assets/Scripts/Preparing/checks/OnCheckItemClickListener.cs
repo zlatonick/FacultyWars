@@ -21,13 +21,15 @@ namespace Preparing.checks
         {
             var image = GetComponent<Image>();
             var type = StuffPack.stuffClass;
-
+            var priceText = GetComponentInChildren<Text>();
+            
             switch (type)
             {
                 case StuffClass.IASA:
                 {
                     image.sprite = spriteIasa;
                     _shopCheck = PreparingData.shopChecksIasa[index];
+                    priceText.color = new Color32(142, 47, 5, 255);
                     break;
                 }
                 
@@ -35,6 +37,7 @@ namespace Preparing.checks
                 {
                     image.sprite = spriteFict;
                     _shopCheck = PreparingData.shopChecksFict[index];
+                    priceText.color = new Color32(76, 111, 13, 255);
                     break;
                 }
                 
@@ -42,12 +45,14 @@ namespace Preparing.checks
                 {
                     image.sprite = spriteFpm;
                     _shopCheck = PreparingData.shopChecksFpm[index];
+                    priceText.color = new Color32(45, 70, 111, 255);
                     break;
                 }
             }
             
-            GetComponentInChildren<Text>().text = "" + _shopCheck.power;
-            this.gameObject.transform.parent.GetComponentsInChildren<Text>()[1].text = _shopCheck.price + "$";
+            priceText.text = "" + _shopCheck.power;
+            
+            this.gameObject.transform.parent.GetComponentsInChildren<Text>()[1].text = _shopCheck.price + "";
         }
 
         public void OnCheckClick()

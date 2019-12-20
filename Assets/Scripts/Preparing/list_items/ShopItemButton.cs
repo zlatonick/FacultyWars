@@ -27,10 +27,12 @@ namespace Preparing.list_items
             _card = card;
             _scrollList = scrollList;
             titleText.text = _card.GetText();
-            priceText.text = "$" + _card.GetPrice();
+            
+
+            priceText.text = "" + _card.GetPrice();
             
             var cardImage = GetComponent<Image>();
-            
+
             switch (card.GetCardType())
             {
                 case CardType.GOLD:
@@ -49,7 +51,28 @@ namespace Preparing.list_items
                     cardImage.sprite = sprites[2];
                     break;
             }
+            
+            switch (StuffPack.stuffClass)
+            {
+                case StuffClass.IASA:
+                {
+                    titleText.color = new Color32(142, 47, 5, 255);
+                    break;
+                }
+                
+                case StuffClass.FICT:
+                {
+                    titleText.color = new Color32(76, 111, 13, 255);
+                    break;
+                }
 
+                case StuffClass.FPM:
+                {
+                    titleText.color = new Color32(45, 70, 111, 255);
+                    break;
+                }
+            }
+            
             button.transform.localScale = new Vector2(0.7f, 0.7f);
         }
 

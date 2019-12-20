@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MetaInfo;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Preparing.list_items
@@ -21,7 +22,7 @@ namespace Preparing.list_items
         {
             _item = item;
             titleLabel.text = item.itemTitle;
-            priceLabel.text = "$" + item.itemPrice;
+            priceLabel.text = "" + item.itemPrice;
 
             _scrollList = scrollList;
 

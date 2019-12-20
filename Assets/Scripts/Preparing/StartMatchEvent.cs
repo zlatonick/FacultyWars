@@ -32,5 +32,12 @@ namespace Preparing
             Debug.Log("Loading Scene: Match");
             SceneManager.LoadScene("Match");
         }
+
+        public void LoadMainScreen()
+        {
+            Debug.Log("Loading Scene: MainMenu");
+            SceneManager.LoadScene("MainMenu");
+        }
+        
     }
 }

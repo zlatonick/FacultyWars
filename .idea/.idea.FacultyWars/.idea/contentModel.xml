@@ -137,7 +137,6 @@
             <e p="checks" t="Include">
               <e p="OnCheckItemClickListener.cs" t="Include" />
             </e>
-            <e p="ChooseFacultyEvent.cs" t="Include" />
             <e p="list_items" t="Include">
               <e p="PickedShopItemButton.cs" t="Include" />
               <e p="ShopItemButton.cs" t="Include" />
