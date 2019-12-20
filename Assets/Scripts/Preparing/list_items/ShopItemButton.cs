@@ -37,42 +37,25 @@ namespace Preparing.list_items
             {
                 case CardType.GOLD:
                     cardImage.sprite = sprites[0];
+                    titleText.color = new Color32(255, 232, 174, 255);
                     break;
                 
                 case CardType.SILVER:
                     cardImage.sprite = sprites[1];
+                    titleText.color = new Color32(236, 232, 232, 255);
                     break;
                 
                 case CardType.NEUTRAL:
                     cardImage.sprite = sprites[2];
+                    titleText.color = new Color32(255, 227, 208, 255);
                     break;
                 
                 default:
                     cardImage.sprite = sprites[2];
+                    titleText.color = new Color32(255, 227, 208, 255);
                     break;
             }
-            
-            switch (StuffPack.stuffClass)
-            {
-                case StuffClass.IASA:
-                {
-                    titleText.color = new Color32(142, 47, 5, 255);
-                    break;
-                }
-                
-                case StuffClass.FICT:
-                {
-                    titleText.color = new Color32(76, 111, 13, 255);
-                    break;
-                }
 
-                case StuffClass.FPM:
-                {
-                    titleText.color = new Color32(45, 70, 111, 255);
-                    break;
-                }
-            }
-            
             button.transform.localScale = new Vector2(0.7f, 0.7f);
         }
 
