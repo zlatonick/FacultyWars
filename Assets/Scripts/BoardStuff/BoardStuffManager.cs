@@ -188,8 +188,8 @@ namespace BoardStuff
             closedHighlightedColor = new Color(closedColor.r,
                 closedColor.g, closedColor.b, 0.78f);
 
-            openedColor = new Color(0.91f, 0.71f, 0.255f);
-            openedHighlightedColor = new Color(0.91f, 0.71f, 0.255f, 0.78f);
+            openedColor = new Color32(255, 255, 255, 255);
+            openedHighlightedColor = new Color32(255, 255, 255, 200);
 
             // Characters
             charGameObjects = new Dictionary<StuffClass, CharacterClickHandler>();
@@ -627,10 +627,10 @@ namespace BoardStuff
             int cellId = GetCellIdByCoords(pos);
             cellClickedAction(cellId);
 
-            if (cellEffects.ContainsKey(cellId))
+            /*if (cellEffects.ContainsKey(cellId))
             {
                 cells[cellId].ShowHideEffectPanel(cellEffects[cellId]);
-            }
+            }*/
         }
 
         public void CharacterClicked(CharacterClickHandler characterClickHandler, Vector2 pos)

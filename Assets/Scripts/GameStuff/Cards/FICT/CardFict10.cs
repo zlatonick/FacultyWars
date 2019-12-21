@@ -10,7 +10,7 @@ namespace GameStuff
         public CardFict10()
             : base(10, 50, CardType.SILVER, StuffClass.FICT, false,
                   "Если у вас на поле есть 3 персонажа, вы получаете +20 к силе " +
-                  "и возвращаете в руку случайного вашего персонажа, погибшего в матче")
+                  "и воскрешаете случайного вашего персонажа")
         { }
 
         public override void Act(Battle battle, MatchController controller)

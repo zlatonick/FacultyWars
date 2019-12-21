@@ -18,7 +18,7 @@ namespace GameStuff
         public CardFict1()
             : base(1, 30, CardType.SILVER, StuffClass.FICT, true,
                   "Вся сила вашего выбранного персонажа на поле переходит " +
-                  "к другому вашему персонажу в бою. Персонаж, лишившийся силы, погибает")
+                  "к другому вашему персонажу в бою")
         { }
 
         public override void Act(Battle battle, MatchController controller)

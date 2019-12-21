@@ -9,7 +9,7 @@ namespace GameStuff
         public CardFict16()
             : base(16, 90, CardType.NEUTRAL, StuffClass.FICT, false,
                   "Каждый раз, когда вы разыгрывает серебряную карту в данном бою, " +
-                  "вы воскрешаете случайного своего персонажа, погибшего в матче")
+                  "вы воскрешаете случайного своего персонажа")
         { }
 
         public override void Act(Battle battle, MatchController controller)

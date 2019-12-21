@@ -32,5 +32,7 @@ namespace GameStuff
         void AddCheckToDead(Check check);
 
         void AddCardToPlayed(Card card);
+
+        void AddBattleToHistory(int result);
     }
 }

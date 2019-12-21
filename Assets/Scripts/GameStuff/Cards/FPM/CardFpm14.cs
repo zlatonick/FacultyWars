@@ -9,7 +9,7 @@ namespace GameStuff
         CardFactory cardFactory;
 
         public CardFpm14()
-            : base(14, 90, CardType.NO_BATTLE, StuffClass.FPM, false,
+            : base(14, 90, CardType.NEUTRAL, StuffClass.FPM, false,
                   "Вы кладете в руку случайную серебряную карту класса вашего противника " +
                   "за каждого персонажа противника на поле")
         {

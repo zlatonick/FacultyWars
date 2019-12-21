@@ -1,5 +1,4 @@
-﻿using BoardStuff;
-using MetaInfo;
+﻿using MetaInfo;
 
 namespace GameStuff
 {
@@ -12,8 +11,7 @@ namespace GameStuff
 
         public override void Act(Battle battle, MatchController controller)
         {
-            PlayerInfo opponentInfo = controller.GetPlayerInfo(battle.GetEnemyPlayer());
-            opponentInfo.SetActionsPermission(false);
+            controller.ChangeBattleStatus(battle.GetEnemyPlayer(), Match.BattleStatus.TWO_CARDS_PLAYED);
         }
 
         

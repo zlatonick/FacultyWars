@@ -219,5 +219,10 @@ namespace BoardStuff
         {
             cardsManager.UnhighlightCards();
         }
+
+        public void AddBattleToHistory(int result)
+        {
+            battlesHistory.Add(result);
+        }
     }
 }

@@ -58,5 +58,7 @@ namespace GameStuff
         PlayerInfo GetPlayerInfo(Player player);
 
         List<Battle> GetCurrBattles();
+
+        void ChangeBattleStatus(Player player, Match.BattleStatus battleStatus);
     }
 }

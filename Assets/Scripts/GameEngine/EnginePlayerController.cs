@@ -136,5 +136,10 @@ namespace GameEngine
 
             return sum;
         }
+
+        public void AddBattleToHistory(int result)
+        {
+            battlesHistory.Add(result);
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace Match
         public GameObject gameOverPanel;
         public Text gameOverWinnerText;
 
+        public GameObject pauseMenu;
+
         private Board board;
 
         private MatchController matchController;
@@ -52,7 +54,7 @@ namespace Match
         void Start()
         {
             // DEBUG. Change to a real StuffPack
-            StuffPack.stuffClass = StuffClass.FICT;            
+            /*StuffPack.stuffClass = StuffClass.FICT;            
             StuffPack.cards = new List<Card>();
             StuffPack.checks = new List<Check>();
 
@@ -73,12 +75,12 @@ namespace Match
             // DEBUG
             CheckFactory checkFactory = new CheckFactoryImpl();
 
-            /*StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 0));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 1));
-            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));*/
             StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));
+            StuffPack.checks.Add(checkFactory.GetCheck(StuffPack.stuffClass, 2));*/
 
             board = new BoardController(boardStuffManager, 4,
                 chooser.CellClicked, chooser.CharacterClicked);
@@ -136,6 +138,14 @@ namespace Match
             }
         }
 
+        void Update()
+        {
+            if (Input.GetKeyDown("escape"))
+            {
+                pauseMenu.SetActive(true);
+            }
+        }
+
         private void UpdateOpponentPanel()
         {
             opponentPanelChecks.text = "x" + opponentInfo.GetChecksCount();
@@ -180,6 +190,7 @@ namespace Match
             Debug.Log("Computer's turn");
 
             int computersTurn = 0;
+            UpdateOpponentPanel();
 
             if (matchController.IsBattleNow())
             {
@@ -282,6 +293,8 @@ namespace Match
                 matchController.FinishMove();
                 playerInfo.UnhighlightCards();
 
+                UpdateOpponentPanel();
+
                 if (matchIsGoing)
                 {
                     if (matchController.GetCurrMovingPlayer() == player)
@@ -313,7 +326,14 @@ namespace Match
 
         public void ExitToMainMenu()
         {
+            StuffPack.cards.Clear();
+            StuffPack.checks.Clear();
             SceneManager.LoadScene("MainMenu");
+        }
+
+        public void ClosePauseMenu()
+        {
+            pauseMenu.SetActive(false);
         }
     }
 }

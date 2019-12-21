@@ -354,7 +354,10 @@ namespace Match
                     battleStatuses[charPlayer] = BattleStatus.NO_CARDS_PLAYED;
                     battleStatuses[charOpponent] = BattleStatus.NO_CARDS_PLAYED;
 
-                    OpenCell(cell, CellState.BATTLED);
+                    if (cell.GetState() == CellState.CLOSED)
+                    {
+                        OpenCell(cell, CellState.BATTLED);
+                    }
 
                     board.StartBattle(cell);
                 }
@@ -471,6 +474,10 @@ namespace Match
                     playersInfo[currOpponent].AddCheckToHand(checkFactory.GetCheck(
                         character.GetStuffClass(), character.GetLevel()));
                 }
+
+                // Adding the result to the history
+                playersInfo[currPlayer].AddBattleToHistory(0);
+                playersInfo[currOpponent].AddBattleToHistory(0);
             }
             else
             {
@@ -490,6 +497,10 @@ namespace Match
                     playersInfo[looser].AddCheckToDead(checkFactory.GetCheck(
                         character.GetStuffClass(), character.GetLevel()));
                 }
+
+                // Adding the result to the history
+                playersInfo[winner].AddBattleToHistory(1);
+                playersInfo[looser].AddBattleToHistory(-1);
             }
 
             // Closing the cell
@@ -824,6 +835,11 @@ namespace Match
             if (!isBattleNow) return null;
 
             return battles[currPlayer];
+        }
+
+        public void ChangeBattleStatus(Player player, BattleStatus battleStatus)
+        {
+            battleStatuses[player] = battleStatus;
         }
     }
 }

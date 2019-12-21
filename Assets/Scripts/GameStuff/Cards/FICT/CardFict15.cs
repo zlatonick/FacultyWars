@@ -9,7 +9,7 @@ namespace GameStuff
         public CardFict15()
             : base(15, 50, CardType.GOLD, StuffClass.FICT, false,
                   "Если ваш уровень силы меньше, чем у противника, " +
-                  "все ваши персонажи с других клеток присоединяются к бою")
+                  "все другие ваши персонажи присоединяются к бою")
         { }
 
         public override void Act(Battle battle, MatchController controller)

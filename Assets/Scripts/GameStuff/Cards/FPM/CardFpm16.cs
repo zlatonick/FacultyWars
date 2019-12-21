@@ -8,8 +8,7 @@ namespace GameStuff
     {
         public CardFpm16()
             : base(16, 50, CardType.SILVER, StuffClass.FPM, false,
-                  "Вы повторяете случайную золотую карту, разыгранную противником в этом матче. " +
-                  "Если противник не разыграл ни одной золотой карты, повторяется серебряная ")
+                  "Вы повторяете случайную золотую карту, разыгранную противником в этом матче. ")
         { }
 
         public override void Act(Battle battle, MatchController controller)

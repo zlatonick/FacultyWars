@@ -12,8 +12,8 @@ namespace GameStuff
 
         public CardFpm3()
             : base(3, 30, CardType.NEUTRAL, StuffClass.FPM, true,
-                  "Текущая клетка поля меняется местами с одной из соседних " +
-                  "(по вашему выбору) и остается открытой. Новая клетка открывается")
+                  "Текущая клетка поля меняется местами с выбранной клеткой " +
+                  "и остается открытой. Новая клетка открывается")
         { }
 
         public override void Act(Battle battle, MatchController controller)

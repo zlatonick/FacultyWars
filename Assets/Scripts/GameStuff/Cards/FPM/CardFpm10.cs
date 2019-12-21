@@ -7,7 +7,7 @@ namespace GameStuff
     {
         public CardFpm10()
             : base(10, 50, CardType.SILVER, StuffClass.FPM, false,
-                  "Вы повторяете последнюю карту, сыгранную противником в этом бою")
+                  "Вы повторяете последнюю карту, сыгранную противником")
         { }
 
         public override void Act(Battle battle, MatchController controller)

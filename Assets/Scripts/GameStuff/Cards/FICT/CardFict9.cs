@@ -13,7 +13,7 @@ namespace GameStuff
         public CardFict9()
             : base(9, 60, CardType.SILVER, StuffClass.FICT, true,
                   "В бой перемещается ваш выбранный персонаж с соседней клетки. " +
-                  "Силы ваших персонажей суммируются. В случае проигрыша вы теряете обоих персонажей")
+                  "Силы ваших персонажей суммируются")
         { }
 
         public override void Act(Battle battle, MatchController controller)
