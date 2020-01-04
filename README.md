@@ -5,6 +5,12 @@ Game development project. KPI 2019
 
 Билд игры под Windows находится в папке Builds/Build_v1.6
 
+[Описание реализации панели с картами - задание курсовой работы, Златокрылец Николай](https://github.com/zlatonick/FacultyWars/blob/master/Documents/CardsPanel.md)
+
+[Описание реализации корзины подготовки к матчу - задание курсовой работы, Гасс Леонид](https://github.com/zlatonick/FacultyWars/blob/master/Documents/UserBasket.md)
+
+[Описание расчета цен карт и фишек - задание курсовой работы, Гасс Леонид](https://github.com/zlatonick/FacultyWars/blob/master/Documents/QuantityAndPrice.md)
+
 ## Общие положения
 Faculty wars - карточная игра, имеющая элементы настольной игры.
 Матчи проходят для двух игроков (на данный момент реализован режим игры человека против компьютера).
