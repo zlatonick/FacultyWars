@@ -5,6 +5,8 @@ Game development project. KPI 2019
 
 Билд игры под Windows находится в папке Builds/Build_v1.6
 
+В папке Documents находятся дополнительные материалы проекта, такие как описание архитектуры и видео с демонстрацией игрового процесса
+
 [Описание реализации панели с картами - задание курсовой работы, Златокрылец Николай](https://github.com/zlatonick/FacultyWars/blob/master/Documents/CardsPanel.md)
 
 [Описание реализации корзины подготовки к матчу - задание курсовой работы, Гасс Леонид](https://github.com/zlatonick/FacultyWars/blob/master/Documents/UserBasket.md)
